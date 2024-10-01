@@ -9,6 +9,6 @@ CREATE DATABASE bd_tcc_etim_122_g1 CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER DATABASE bd_tcc_etim_122_g1 CHARACTER SET utf8 COLLATE utf8_general_ci; 
 
 servidor: 10.67.22.216
-usuário: bd_tcc_etim_122_g1
+banco: bd_tcc_etim_122_g1
 senha: ab1506
-banco: s223_node
+usuario: us_etim_122_g1

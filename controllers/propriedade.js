@@ -2,11 +2,19 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarPropriedade(request, response) {
-        try {            
+        try {  
+            
+            const sql = `SELECT Prop_Id, Prop_Nome, Prop_Hectare, Prop_Cidade, Prop_Estado, Prop_Lat, Prop_Lng, Agri_Id from propriedade`;
+
+            const propriedade = await db.query(sql);
+
+           //função que executa as intruções sql (função que armazena o resultado em uma const)
+           const apiarios = await db.query(sql)
+            
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Propriedade.', 
-                dados: null
+                dados: propriedade[0]
             });
         } catch (error) {
             return response.status(500).json({
