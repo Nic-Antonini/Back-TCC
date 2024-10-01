@@ -2,11 +2,16 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarAdministradores(request, response) {
-        try {            
+        try {
+            
+            const sql = `SELECT Adm_Id FROM Administrador`;
+
+            const  administrador = await db.query(sql);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de admnistrador.', 
-                dados: null
+                dados: administrador[0]
             });
         } catch (error) {
             return response.status(500).json({

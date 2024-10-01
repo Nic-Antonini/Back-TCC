@@ -2,11 +2,16 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarGaleria(request, response) {
-        try {            
+        try {    
+            
+            const sql = `SELECT Gale_Id, Gale_Foto, Usu_Id FROM galeria`;
+
+            const galeria = await db.query(sql);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Galeria.', 
-                dados: null
+                dados: galeria[0]
             });
         } catch (error) {
             return response.status(500).json({
