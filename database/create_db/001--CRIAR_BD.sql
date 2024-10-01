@@ -1,0 +1,28 @@
+CREATE DATABASE us_etim_122_g1; 
+
+SHOW DATABASES; 
+
+USE us_etim_122_g1; 
+
+SELECT DATABASE(); 
+
+-- ALTER SCHEMA us_etim_122_g1 RENAME TO bd_tcc_etim_122_g1; 
+DROP DATABASE bd_tcc_etim_122_g1; 
+
+CREATE DATABASE bd_tcc_etim_122_g1; 
+
+SHOW DATABASES; 
+
+USE bd_tcc_etim_122_g1;
+
+SELECT DATABASE(); 
+
+CREATE USER 'us_etim_122_g1' IDENTIFIED BY 'ab1506';
+
+GRANT ALL PRIVILEGES ON S223_node.* TO us_etim_122_g1;
+
+
+
+
+
+
