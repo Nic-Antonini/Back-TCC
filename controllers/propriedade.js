@@ -14,7 +14,7 @@ module.exports = {
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Propriedade.', 
-                dados: propriedade[0]
+                dados: propriedade[0],
             });
         } catch (error) {
             return response.status(500).json({
