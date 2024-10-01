@@ -82,13 +82,23 @@ module.exports = {
         }
     }, 
     
+
     async editarUsuarios(request, response) {
-        try {            
+        try {    
+            const {Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo} = request.body;
+            const {Usu_Id} = request.params;
+            const sql= `UPDATE Usuario SET Usu_NomeCompleto = ?,  Usu_Email = ?, Usu_Senha = ?, Usu_Tipo = ?
+                        WHERE Usu_Id = ?;`;
+            const values = [Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo, Usu_Id];
+            const atualizaDados = await db.query (sql, values);
+
+        
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'editar usuários.', 
-                dados: null
+                mensagem: `Usuário ${Usu_Id} atualizado com sucesso!`, 
+                dados: atualizaDados[0].affectedRows
             });
+
         } catch (error) {
             return response.status(500).json({
                 sucesso: false,
