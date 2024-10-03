@@ -2,11 +2,16 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarColmeia(request, response) {
+
+        const sql=`select Colm_Id, Apia_Id FROM colmeia`
+
+        const colmeia = await db.query(sql)
+
         try {            
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Colmeia.', 
-                dados: null
+                dados: colmeia[0]
             });
         } catch (error) {
             return response.status(500).json({

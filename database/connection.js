@@ -1,10 +1,10 @@
 const mysql = require('mysql2/promise'); 
 
-const bd_usuario = 'root'; // usuário
-const bd_senha = 'bdnicolas'; // senha
-const bd_servidor = '127.0.0.1'; // servidor
+const bd_usuario = 'us_etim_122_g1'; // usuário
+const bd_senha = 'ab1506'; // senha
+const bd_servidor = '10.67.22.216'; // servidor
 const bd_porta = '3306'; // porta
-const bd_banco = 'BeeTech'; // nome do banco
+const bd_banco = 'bd_tcc_etim_122_g1'; // nome do banco
 let connection;
     
 const config = {

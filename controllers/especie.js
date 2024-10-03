@@ -2,11 +2,16 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarEspecie(request, response) {
+
+            const sql = `SELECT Espe_Id, Espe_Nome FROM especie`
+
+            const especie = await db.query(sql)
+
         try {            
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Especie.', 
-                dados: null
+                dados: especie[0]
             });
         } catch (error) {
             return response.status(500).json({
