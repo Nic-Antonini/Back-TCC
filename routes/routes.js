@@ -11,7 +11,8 @@ const UsuariosController = require('../controllers/usuarios');
 router.get('/usuarios', UsuariosController.listarUsuarios); 
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
 router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
-router.delete('/usuarios', UsuariosController.apagarUsuarios); 
+router.delete('/usuarios/:Usu_Id', UsuariosController.apagarUsuarios); 
+router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
 
 
 const AdministradorController = require('../controllers/administrador'); 
@@ -34,12 +35,11 @@ router.delete('/apicultor', ApicultorController.apagarApicultores);
 
 const AgricultorController = require('../controllers/agricultor'); 
 
-router.get('/agricultor', AgricultorController.listarAgricultores);
-router.get('/agricultor/:id', AgricultorController.listarAgricultorPorId);  
-router.post('/agricultor', AgricultorController.cadastrarAgricultor); 
-router.patch('/agricultor', AgricultorController.editarAgricultores); 
-router.delete('/agricultor', AgricultorController.apagarAgricultores); 
-
+router.get('/agricultor', AgricultorController.listarAgricultor); 
+router.post('/agricultor', AgricultorController.cadastrarAgricultor);  
+router.patch('/agricultor', AgricultorController.editarAgricultor);  
+router.delete('/agricultor', AgricultorController.apagarAgricultor);  
+router.delete('/agricultor', AgricultorController.ocultarAgricultor); 
 
 const ApiarioController = require('../controllers/apiarios'); 
 
