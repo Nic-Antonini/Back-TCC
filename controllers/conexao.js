@@ -2,11 +2,17 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarConexao(request, response) {
-        try {            
+        try {  
+            
+            const sql = `SELECT Con_Id, Con_Salvar, Usu_Id FROM Conexao`;
+
+            const conexao = await db.query(sql);
+           
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Conexao.', 
-                dados: null
+                dados: conexao[0]
             });
         } catch (error) {
             return response.status(500).json({
