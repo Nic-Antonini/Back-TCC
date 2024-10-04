@@ -109,6 +109,8 @@ module.exports = {
             });
         }
     }, 
+
+    
     async apagarUsuarios(request, response) {
         try {  
             const {Usu_Id} = request.params;

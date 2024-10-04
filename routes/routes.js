@@ -37,9 +37,8 @@ const AgricultorController = require('../controllers/agricultor');
 
 router.get('/agricultor', AgricultorController.listarAgricultor); 
 router.post('/agricultor', AgricultorController.cadastrarAgricultor);  
-router.patch('/agricultor', AgricultorController.editarAgricultor);  
-router.delete('/agricultor', AgricultorController.apagarAgricultor);  
-router.delete('/agricultor', AgricultorController.ocultarAgricultor); 
+router.patch('/agricultor/:Agri_Id', AgricultorController.editarAgricultor); 
+router.delete('/agricultor/:Usu_Id', AgricultorController.apagarAgricultor);
 
 const ApiarioController = require('../controllers/apiarios'); 
 
