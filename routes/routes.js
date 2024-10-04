@@ -17,7 +17,7 @@ router.delete('/usuarios', UsuariosController.apagarUsuarios);
 const AdministradorController = require('../controllers/administrador'); 
 
 router.get('/administrador', AdministradorController.listarAdministradores); 
-router.get('/administrador/:id', AdministradorController.listarAdministradorPorId); 
+// router.get('/administrador/:id', AdministradorController.listarAdministradorPorId); 
 router.post('/administrador', AdministradorController.cadastrarAdministrador); 
 router.patch('/administrador', AdministradorController.editarAdministrador); 
 router.delete('/administrador', AdministradorController.apagarAdministrador); 

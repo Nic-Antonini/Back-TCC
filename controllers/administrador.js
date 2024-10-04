@@ -22,37 +22,23 @@ module.exports = {
         }
     }, 
     
-    async listarAdministradorPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const administrador = await db('Administrador').where('id', id).first();
-            if (!administrador) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Administrador não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Administrador encontrado.',
-                dados: agricultor
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
-    
     async cadastrarAdministrador(request, response) {
-        try {            
+        try {   
+            
+            const {adm_Id} = request.body;
+
+            const sql = `INSERT INTO administrador (Adm_Id) VALUES (?)`;
+
+            const values = [adm_Id];
+
+            const execSql = await db.query(sql, values);
+
+            const cadastrar = execSql[0]. insertId;
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de Administrador.', 
-                dados: null
+                dados: adm_Id
             });
         } catch (error) {
             return response.status(500).json({
