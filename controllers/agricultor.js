@@ -60,7 +60,7 @@ module.exports = {
 
     async cadastrarAgricultor(request, response) {
         try {
-            const { Agri_id, Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id } = request.body;
+            const {Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id } = request.body;
 
             const sql = `INSERT INTO Agricultor
                 (Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id)
@@ -119,8 +119,10 @@ module.exports = {
     async apagarAgricultor(request, response) {
         try {
             const { Usu_Id } = request.params;
-            const sql = `UPDATE Usuario SET Usu_Ativo = 0 
-                        WHERE Usu_Id = ?;`;
+            const sql = `UPDATE Usuario    Usu
+                     INNER JOIN Agricultor Agr ON Usu.Usu_Id = Agr.Usu_id
+                            SET Usu.Usu_Ativo = 0 
+                          WHERE Agr.Agri_id = ?;`;
             const values = [Usu_Id]
             const excluir = await db.query(sql, values);
 
@@ -140,27 +142,27 @@ module.exports = {
     },
 
 
-    async ocultarAgricultor(request, response) {
-        try {
-            const Agri_Ativo = false;
-            const { Agri_Id } = request.params;
-            const sql = `UPDATE Agricultor SET Agri_Ativo = ?
-            WHERE Agri_Id = ?;`;
-            const values = [Agri_Ativo, Agri_Id];
-            const atualizacao = await db.query(sql, values);
+    // async ocultarAgricultor(request, response) {
+    //     try {
+    //         const Agri_Ativo = false;
+    //         const { Agri_Id } = request.params;
+    //         const sql = `UPDATE Agricultor SET Agri_Ativo = ?
+    //         WHERE Agri_Id = ?;`;
+    //         const values = [Agri_Ativo, Agri_Id];
+    //         const atualizacao = await db.query(sql, values);
 
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: `Agricultor ${Agri_Id} excluído com sucesso`,
-                dados: atualizacao[0].affectedRows
-            });
+    //         return response.status(200).json({
+    //             sucesso: true,
+    //             mensagem: `Agricultor ${Agri_Id} excluído com sucesso`,
+    //             dados: atualizacao[0].affectedRows
+    //         });
 
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }
+    //     } catch (error) {
+    //         return response.status(500).json({
+    //             sucesso: false,
+    //             mensagem: 'Erro na requisição.',
+    //             dados: error.message
+    //         });
+    //     }
+    // }
 }

@@ -26,11 +26,10 @@ router.delete('/administrador', AdministradorController.apagarAdministrador);
 
 const ApicultorController = require('../controllers/apicultor'); 
 
-router.get('/apicultor',ApicultorController.listarApicultores);
-router.get('/apicultor/:id', ApicultorController.listarApicultorPorId); 
-router.post('/apicultor', ApicultorController.cadastrarApicultores); 
-router.patch('/apicultor', ApicultorController.editarApicultores); 
-router.delete('/apicultor', ApicultorController.apagarApicultores); 
+router.get('/apicultor', ApicultorController.listarApicultor); 
+router.post('/apicultor', ApicultorController.cadastrarApicultor);  
+router.patch('/apicultor/:Apic_Id', ApicultorController.editarApicultor); 
+router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
 
 
 const AgricultorController = require('../controllers/agricultor'); 
