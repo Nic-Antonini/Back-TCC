@@ -40,7 +40,7 @@ module.exports = {
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de Conexao.', 
-                dados: null
+                dados: Con_Id
             });
         } catch (error) {
             return response.status(500).json({
