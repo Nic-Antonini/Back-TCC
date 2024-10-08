@@ -80,7 +80,7 @@ router.delete('/colmeia_especie', ColmeiaEspecieController.apagarColmeiaEspecie)
 const ConexaoController = require('../controllers/conexao'); 
 
 router.get('/conexao', ConexaoController.listarConexao); 
-router.get('/conexao/:id', ConexaoController.listarConexaoPorId);
+// router.get('/conexao/:id', ConexaoController.listarConexaoPorId);
 router.post('/conexao', ConexaoController.cadastrarConexao); 
 router.patch('/conexao', ConexaoController.editarConexao); 
 router.delete('/conexao', ConexaoController.apagarConexao); 
@@ -116,7 +116,7 @@ router.delete('/especie', EspecieController.apagarEspecie);
 const GaleriaController = require('../controllers/galeria'); 
 
 router.get('/galeria', GaleriaController.listarGaleria); 
-router.get('/galeria/:id', GaleriaController.listarGaleriaPorId);
+//router.get('/galeria/:id', GaleriaController.listarGaleriaPorId);
 router.post('/galeria', GaleriaController.cadastrarGaleria); 
 router.patch('/galeria', GaleriaController.editarGaleria); 
 router.delete('/galeria', GaleriaController.apagarGaleria);

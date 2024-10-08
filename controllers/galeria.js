@@ -21,36 +21,23 @@ module.exports = {
             });
         }
     }, 
-    async listarGaleriaPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const galeria = await db('Galeria').where('id', id).first();
-            if (!galeria) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Galeria não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Galeria encontrado.',
-                dados: agricultor
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
     async cadastrarGaleria(request, response) {
-        try {            
+        try {  
+            
+            const {Gale_Id} = request.body;
+
+            const sql = `INSERT INTO galeria (Gale_Id, Gale_Foto, Usu_Id) VALUES (?, ?, ?)`;
+
+            const values = [Gale_Id];
+
+            const execSql = await db.query(sql, values);
+
+            const cadastrar = execSql[0]. insertId;
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de Galeria.', 
-                dados: null
+                dados: Gale_Id
             });
         } catch (error) {
             return response.status(500).json({

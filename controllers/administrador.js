@@ -50,11 +50,22 @@ module.exports = {
     }, 
    
     async editarAdministrador(request, response) {
-        try {            
+        try {  
+            
+            const {adm_Id} = request.body;
+
+            const {Adm_Id} = request.params;
+
+            const sql = `UPDATE administrador SET Adm_Id = ?`;
+
+            const values = [Adm_Id];
+
+            const atualizaDados = await db.query(slq, values);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'editar Administrador.', 
-                dados: null
+                dados: adm_Id
             });
         } catch (error) {
             return response.status(500).json({
@@ -65,11 +76,21 @@ module.exports = {
         }
     }, 
     async apagarAdministrador(request, response) {
-        try {            
+        try {  
+            
+            const {Adm_Id} = request.params;
+
+            const sql = `DELETE FROM administrador WHERE Adm_Id = ?`;
+
+            const values = [Adm_Id];
+
+            const excluir = await db.query(sql, values);
+
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Apagar Administrador.', 
-                dados: null
+                dados: excluir[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
