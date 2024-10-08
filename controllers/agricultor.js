@@ -60,16 +60,26 @@ module.exports = {
 
     async cadastrarAgricultor(request, response) {
         try {
-            const {Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id } = request.body;
 
-            const sql = `INSERT INTO Agricultor
+            const {Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo, Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia} = request.body;
+            
+            const sql = `INSERT INTO Usuario
+                (Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo)
+                VALUES (?,?,?,?)`;
+                
+
+            const values = [Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo]
+            const execSql = await db.query(sql,values);
+            const Usu_Id = execSql[0].insertId;            
+
+            const sql2 = `INSERT INTO Agricultor
                 (Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id)
                 VALUES (?,?,?,?)`;
 
 
-            const values = [Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id]
-            const execSql = await db.query(sql, values);
-            const Agri_Id = execSql[0].insertId;
+            const values2 = [Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id]
+            const execSql2 = await db.query(sql2, values2);
+            const Agri_Id = execSql2[0].insertId;
 
 
             return response.status(200).json({
@@ -86,7 +96,6 @@ module.exports = {
             });
         }
     },
-
 
 
     async editarAgricultor(request, response) {

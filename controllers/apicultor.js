@@ -60,16 +60,26 @@ module.exports = {
 
     async cadastrarApicultor(request, response) {
         try {
-            const {Apic_Foto_Perfil, Apic_Foto_Capa, Apic_Biografia, Usu_Id } = request.body;
 
-            const sql = `INSERT INTO Apicultor
+            const {Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo, Apic_Foto_Perfil, Apic_Foto_Capa, Apic_Biografia} = request.body;
+            
+            const sql = `INSERT INTO Usuario
+                (Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo)
+                VALUES (?,?,?,?)`;
+                
+
+            const values = [Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo]
+            const execSql = await db.query(sql,values);
+            const Usu_Id = execSql[0].insertId;            
+
+            const sql2 = `INSERT INTO Apicultor
                 (Apic_Foto_Perfil, Apic_Foto_Capa, Apic_Biografia, Usu_Id)
                 VALUES (?,?,?,?)`;
 
 
-            const values = [Apic_Foto_Perfil, Apic_Foto_Capa, Apic_Biografia, Usu_Id]
-            const execSql = await db.query(sql, values);
-            const Apic_Id = execSql[0].insertId;
+            const values2 = [Apic_Foto_Perfil, Apic_Foto_Capa, Apic_Biografia, Usu_Id]
+            const execSql2 = await db.query(sql2, values2);
+            const Apic_Id = execSql2[0].insertId;
 
 
             return response.status(200).json({
