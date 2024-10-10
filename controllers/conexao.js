@@ -28,7 +28,7 @@ module.exports = {
             
             const {Con_Salvar, Usu_Id } = request.body;
 
-            const sql = `INSERT INTO conexao (Con_Salvar, Usu_Id, Con_Id) VALUES (?, ?, ?)`;
+            const sql = `INSERT INTO conexao (Con_Salvar, Usu_Id) VALUES (?, ?)`;
 
             const values = [Con_Salvar, Usu_Id];
 
@@ -82,7 +82,7 @@ module.exports = {
             
             const {Con_Id} = request.params;
 
-            const sql = `DELETE FROM conexao WHERE Con_Salvar = ?, Usu_Id = ?`;
+            const sql = `DELETE FROM conexao WHERE Con_Id = ?`;
 
             const values = [Con_Id];
 

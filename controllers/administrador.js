@@ -60,7 +60,7 @@ module.exports = {
 
             const values = [Adm_Id];
 
-            const atualizaDados = await db.query(slq, values);
+            const atualizaDados = await db.query(sql, values);
 
             return response.status(200).json({
                 sucesso: true, 

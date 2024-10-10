@@ -24,20 +24,20 @@ module.exports = {
     async cadastrarGaleria(request, response) {
         try {  
             
-            const {Gale_Foto, Usu_Id} = request.body;
+            const {Usu_Id, Gale_Foto} = request.body;
 
-            const sql = `INSERT INTO galeria (Gale_Id, Gale_Foto, Usu_Id) VALUES (?, ?, ?)`;
+            const sql = `INSERT INTO galeria (Usu_Id, Gale_Foto) VALUES (?, ?)`;
 
-            const values = [Gale_Foto, Usu_Id];
+            const values = [Usu_Id, Gale_Foto ];
 
             const execSql = await db.query(sql, values);
 
-            const Gale_Id = execSql[0]. insertId;
+            const Gale_Id = execSql[0].insertId;
 
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de Galeria.', 
-                dados: Gale_Id
+                dados:Gale_Id
             });
         } catch (error) {
             return response.status(500).json({
@@ -79,7 +79,7 @@ module.exports = {
             
             const {Gale_Id} = request.params;
 
-            const sql = `DELETE FROM galeria WHERE Usu_Id = ?, Gale_Foto = ?`;
+            const sql = `DELETE FROM galeria WHERE Gale_Id = ?`;
 
             const values = [Gale_Id];
 

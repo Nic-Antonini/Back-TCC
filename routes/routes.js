@@ -19,8 +19,8 @@ const AdministradorController = require('../controllers/administrador');
 router.get('/administrador', AdministradorController.listarAdministradores); 
 // router.get('/administrador/:id', AdministradorController.listarAdministradorPorId); 
 router.post('/administrador', AdministradorController.cadastrarAdministrador); 
-router.patch('/administrador', AdministradorController.editarAdministrador); 
-router.delete('/administrador', AdministradorController.apagarAdministrador); 
+router.patch('/administrador/:adm_Id', AdministradorController.editarAdministrador); 
+router.delete('/administrador/:adm_id', AdministradorController.apagarAdministrador); 
 
 
 const ApicultorController = require('../controllers/apicultor'); 
@@ -83,7 +83,7 @@ router.get('/conexao', ConexaoController.listarConexao);
 // router.get('/conexao/:id', ConexaoController.listarConexaoPorId);
 router.post('/conexao', ConexaoController.cadastrarConexao); 
 router.patch('/conexao', ConexaoController.editarConexao); 
-router.delete('/conexao', ConexaoController.apagarConexao); 
+router.delete('/conexao/:Con_Id', ConexaoController.apagarConexao); 
 
 
 const CultivoController = require('../controllers/cultivo'); 
@@ -119,7 +119,7 @@ router.get('/galeria', GaleriaController.listarGaleria);
 //router.get('/galeria/:id', GaleriaController.listarGaleriaPorId);
 router.post('/galeria', GaleriaController.cadastrarGaleria); 
 router.patch('/galeria', GaleriaController.editarGaleria); 
-router.delete('/galeria', GaleriaController.apagarGaleria);
+router.delete('/galeria/:Gale_Id', GaleriaController.apagarGaleria);
 
 const PropriedadeController = require('../controllers/propriedade'); 
 
