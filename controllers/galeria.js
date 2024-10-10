@@ -24,15 +24,15 @@ module.exports = {
     async cadastrarGaleria(request, response) {
         try {  
             
-            const {Gale_Id} = request.body;
+            const {Gale_Foto, Usu_Id} = request.body;
 
             const sql = `INSERT INTO galeria (Gale_Id, Gale_Foto, Usu_Id) VALUES (?, ?, ?)`;
 
-            const values = [Gale_Id];
+            const values = [Gale_Foto, Usu_Id];
 
             const execSql = await db.query(sql, values);
 
-            const cadastrar = execSql[0]. insertId;
+            const Gale_Id = execSql[0]. insertId;
 
             return response.status(200).json({
                 sucesso: true, 
@@ -48,11 +48,23 @@ module.exports = {
         }
     }, 
     async editarGaleria(request, response) {
-        try {            
+        try { 
+            
+            const {Usu_Id, Gale_Foto}= request.body;
+
+            const {Gale_Id} = request.params;
+
+            const sql = `UPDATE galeria SET Usu_Id=?, Gale_Foto= ?`;
+
+            const values = [Usu_Id, Gale_Foto, Gale_Id];
+
+            const atualizaDados = await db.query(slq, values);
+            
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'editar Galeria.', 
-                dados: null
+                dados:atualizaDados[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
@@ -63,11 +75,21 @@ module.exports = {
         }
     }, 
     async apagarGaleria(request, response) {
-        try {            
+        try {    
+            
+            const {Gale_Id} = request.params;
+
+            const sql = `DELETE FROM galeria WHERE Usu_Id = ?, Gale_Foto = ?`;
+
+            const values = [Gale_Id];
+
+            const excluir = await db.query(sql, values);
+
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Apagar Galeria.', 
-                dados: null
+                dados: excluir[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({

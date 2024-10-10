@@ -51,11 +51,23 @@ module.exports = {
         }
     }, 
     async editarConexao(request, response) {
-        try {            
+        try { 
+            
+             
+            const {Usu_Id, Con_Salvar}= request.body;
+
+            const {Con_Id} = request.params;
+
+            const sql = `UPDATE conexao SET Usu_Id=?, Con_Salvar= ?`;
+
+            const values = [Usu_Id, Con_Salvar, Con_Id];
+
+            const atualizaDados = await db.query(slq, values);
+            
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'editar Conexao.', 
-                dados: null
+                dados: atualizaDados[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
@@ -66,11 +78,20 @@ module.exports = {
         }
     }, 
     async apagarConexao(request, response) {
-        try {            
+        try {     
+            
+            const {Con_Id} = request.params;
+
+            const sql = `DELETE FROM conexao WHERE Con_Salvar = ?, Usu_Id = ?`;
+
+            const values = [Con_Id];
+
+            const excluir = await db.query(sql, values);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Apagar Conexao.', 
-                dados: null
+                dados: excluir[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
