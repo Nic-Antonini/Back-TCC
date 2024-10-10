@@ -17,11 +17,11 @@ router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
 
 const AdministradorController = require('../controllers/administrador'); 
 
-router.get('/administrador', AdministradorController.listarAdministradores); 
-router.get('/administrador/:id', AdministradorController.listarAdministradorPorId); 
-router.post('/administrador', AdministradorController.cadastrarAdministrador); 
-router.patch('/administrador', AdministradorController.editarAdministrador); 
-router.delete('/administrador', AdministradorController.apagarAdministrador); 
+router.get('/administrador', AdministradorController.listarAdministrador); 
+router.post('/administrador', AdministradorController.cadastrarAdministrador);  
+router.patch('/administrador/:Adm_Id', AdministradorController.editarAdministrador); 
+router.delete('/administrador/:Usu_Id', AdministradorController.apagarAdministrador);
+
 
 
 const ApicultorController = require('../controllers/apicultor'); 
