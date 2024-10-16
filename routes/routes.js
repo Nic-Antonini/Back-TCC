@@ -39,13 +39,14 @@ router.post('/agricultor', AgricultorController.cadastrarAgricultor);
 router.patch('/agricultor/:Agri_Id', AgricultorController.editarAgricultor); 
 router.delete('/agricultor/:Usu_Id', AgricultorController.apagarAgricultor);
 
-const ApiarioController = require('../controllers/apiarios'); 
+const ApiariosController = require('../controllers/apiarios'); 
 
-router.get('/apiarios', ApiarioController.listarApiarios); 
-router.get('/apiarios/:id', ApiarioController.listarApiariosPorId);
-router.post('/apiarios', ApiarioController.cadastrarApiarios); 
-router.patch('/apiarios', ApiarioController.editarApiarios); 
-router.delete('/apiarios', ApiarioController.apagarApiarios); 
+router.get('/apiarios', ApiariosController.listarApiarios); 
+router.post('/apiarios', ApiariosController.cadastrarApiarios); 
+router.patch('/apiarios/:Apia_Id', ApiariosController.editarApiarios); 
+router.delete('/apiarios/:Apia_Id', ApiariosController.apagarApiarios); 
+router.delete('/apiarios/del/:Apia_Id', ApiariosController.ocultarApiarios);
+
 
 
 const ChatController = require('../controllers/chat'); 

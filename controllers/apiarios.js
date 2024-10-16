@@ -2,12 +2,28 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarApiarios(request, response) {
-        try {            
+        try {     
+            const sql = `SELECT
+                Apia_Id, Apia_Nome, Apia_Cidade,
+                Apia_Estado, Apia_Lat, Apia_Lng,
+                Apia_Caixas, Apia_Ativo, Apic_Id
+                FROM Apiarios
+                WHERE Apia_Ativo = 1;`;     
+                
+               
+              const Apiarios = await db.query(sql);
+
+               
+               const nItens = Apiarios[0].length;
+
+
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Lista de Apiarios.', 
-                dados: null
+                mensagem: 'Lista de Apiários.', 
+                dados: Apiarios[0],
+                nItens
             });
+            
         } catch (error) {
             return response.status(500).json({
                 sucesso: false,
@@ -16,21 +32,22 @@ module.exports = {
             });
         }
     }, 
-    async listarApiariosPorId(request, response) {
+
+    async listarApiarioPorId(request, response) {
         try {
             const id = request.params.id;
-            const apiarios = await db('Apiarios').where('id', id).first();
+            const apiarios = await db('Apiario').where('id', id).first();
             if (!apiarios) {
                 return response.status(404).json({
                     sucesso: false,
-                    mensagem: 'Apiarios não encontrado.',
+                    mensagem: 'Apiário não encontrado.',
                     dados: null
                 });
             }
             return response.status(200).json({
                 sucesso: true,
-                mensagem: 'Apiarios encontrado.',
-                dados: agricultor
+                mensagem: 'Apiário encontrado.',
+                dados: apiarios
             });
         } catch (error) {
             return response.status(500).json({
@@ -40,49 +57,6 @@ module.exports = {
             });
         }
     },
-    async cadastrarApiarios(request, response) {
-        try {            
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: 'Cadastro de Apiarios.', 
-                dados: null
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
-    async editarApiarios(request, response) {
-        try {            
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: 'editar Apiarios.', 
-                dados: null
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
-    async apagarApiarios(request, response) {
-        try {            
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: 'Apagar Apiarios.', 
-                dados: null
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
-};  
+
+
+}
