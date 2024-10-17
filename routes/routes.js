@@ -62,7 +62,7 @@ router.delete('/chat', ChatController.apagarChats);
 const ColmeiaController = require('../controllers/colmeia'); 
 
 router.get('/colmeia', ColmeiaController.listarColmeia); 
-router.get('/colmeia/:id', ColmeiaController.listarColmeiaPorId);
+//router.get('/colmeia/:id', ColmeiaController.listarColmeiaPorId);
 router.post('/colmeia', ColmeiaController.cadastrarColmeia); 
 router.patch('/colmeia', ColmeiaController.editarColmeia); 
 router.delete('/colmeia', ColmeiaController.apagarColmeia); 
@@ -71,7 +71,7 @@ router.delete('/colmeia', ColmeiaController.apagarColmeia);
 const ColmeiaEspecieController = require('../controllers/colmeia_especie'); 
 
 router.get('/colmeia_especie', ColmeiaEspecieController.listarColmeiaEspecie); 
-router.get('/colmeia_especie/:id', ColmeiaEspecieController.listarColmeiaEspeciePorId);
+//router.get('/colmeia_especie/:id', ColmeiaEspecieController.listarColmeiaEspeciePorId);
 router.post('/colmeia_especie', ColmeiaEspecieController.cadastrarColmeiaEspecie); 
 router.patch('/colmeia_especie', ColmeiaEspecieController.editarColmeiaEspecie); 
 router.delete('/colmeia_especie', ColmeiaEspecieController.apagarColmeiaEspecie); 
@@ -107,7 +107,7 @@ router.delete('/cultivo_propriedade', CultivoPropriedadeController.apagarCultivo
 const EspecieController = require('../controllers/especie'); 
 
 router.get('/especie', EspecieController.listarEspecie); 
-router.get('/especie/:id', EspecieController.listarEspeciePorId);
+//router.get('/especie/:id', EspecieController.listarEspeciePorId);
 router.post('/especie', EspecieController.cadastrarEspecie); 
 router.patch('/especie', EspecieController.editarEspecie); 
 router.delete('/especie', EspecieController.apagarEspecie); 

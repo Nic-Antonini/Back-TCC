@@ -22,11 +22,22 @@ module.exports = {
         }
     }, 
     async cadastrarColmeiaEspecie(request, response) {
-        try {            
+        try { 
+            
+            const {Colm_Id, Espe_Id } = request.body;
+
+            const sql = `INSERT INTO conexao (Colm_Id, Espe_Id) VALUES (?, ?)`;
+
+            const values = [Colm_Id, Espe_Id];
+
+            const execSql = await db.query(sql, values);
+
+            const Colm_Espe_Id = execSql[0].insertId;
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de Colmeia Especie.', 
-                dados: null
+                dados: Colm_Espe_Id
             });
         } catch (error) {
             return response.status(500).json({
@@ -36,36 +47,24 @@ module.exports = {
             });
         }
     }, 
-    async listarColmeiaEspeciePorId(request, response) {
-        try {
-            const id = request.params.id;
-            const colmeiaEspecie = await db('Colmeia_Especie').where('id', id).first();
-            if (!colmeiaEspecie) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Colmeia Especie não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Colmeia Especie encontrado.',
-                dados: agricultor
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
+
     async editarColmeiaEspecie(request, response) {
-        try {            
+        try {  
+            
+            const {Colm_Id, Espe_Id}= request.body;
+
+            const {Colm_Espe_Id} = request.params;
+
+            const sql = `UPDATE conexao SET Colm_Id=?, Espe_Id= ?`;
+
+            const values = [Colm_Id, Espe_Id, Colm_Espe_Id];
+
+            const atualizaDados = await db.query(slq, values);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'editar Colmeia Especie.', 
-                dados: null
+                dados: atualizaDados[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
@@ -76,11 +75,20 @@ module.exports = {
         }
     }, 
     async apagarColmeiaEspecie(request, response) {
-        try {            
+        try {   
+            
+            const {Colm_Espe_Id} = request.params;
+
+            const sql = `DELETE FROM conexao WHERE Colm_Espe_Id = ?`;
+
+            const values = [Colm_Espe_Id];
+
+            const excluir = await db.query(sql, values);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Apagar Colmeia Especie.', 
-                dados: null
+                dados:  excluir[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({

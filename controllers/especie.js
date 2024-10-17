@@ -21,36 +21,24 @@ module.exports = {
             });
         }
     }, 
-    async listarEspeciePorId(request, response) {
-        try {
-            const id = request.params.id;
-            const especie = await db('Especie').where('id', id).first();
-            if (!especie) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Especie não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Especie encontrado.',
-                dados: agricultor
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
+
     async cadastrarEspecie(request, response) {
-        try {            
+        try {  
+            
+            const {Espe_Nome } = request.body;
+
+            const sql = `INSERT INTO conexao (Espe_Nome) VALUES (?)`;
+
+            const values = [Espe_Nome];
+
+            const execSql = await db.query(sql, values);
+
+            const Espe_Id = execSql[0].insertId;
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de Especie.', 
-                dados: null
+                dados: Espe_Id
             });
         } catch (error) {
             return response.status(500).json({
@@ -61,11 +49,22 @@ module.exports = {
         }
     }, 
     async editarEspecie(request, response) {
-        try {            
+        try { 
+            
+            const { Espe_Nome }= request.body;
+
+            const {Espe_Id} = request.params;
+
+            const sql = `UPDATE conexao SET Espe_Nome= ?`;
+
+            const values = [Espe_Nome, Espe_Id ];
+
+            const atualizaDados = await db.query(slq, values);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'editar Especie.', 
-                dados: null
+                dados: atualizaDados[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
@@ -76,11 +75,20 @@ module.exports = {
         }
     }, 
     async apagarEspecie(request, response) {
-        try {            
+        try {   
+            
+            const {Espe_Id} = request.params;
+
+            const sql = `DELETE FROM conexao WHERE Espe_Id = ?`;
+
+            const values = [Espe_Id];
+
+            const excluir = await db.query(sql, values);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Apagar Especie.', 
-                dados: null
+                dados:  excluir[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
