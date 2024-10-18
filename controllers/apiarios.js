@@ -123,29 +123,6 @@ module.exports = {
     }, 
 
 
-    
-    async apagarApiarios(request, response) {
-        try {  
-            const {Apia_Id} = request.params;
-            const sql = `DELETE FROM Apiarios WHERE Apia_Id = ?`;
-            const values = [Apia_Id]     
-            const excluir = await db.query (sql, values);
-
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: `Apiário ${Apia_Id} excluído com sucesso`, 
-                dados: excluir [0].affectedRows
-            });
-
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
-
 
 
     async ocultarApiarios(request, response) {

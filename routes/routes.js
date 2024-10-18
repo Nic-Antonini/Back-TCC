@@ -44,7 +44,6 @@ const ApiariosController = require('../controllers/apiarios');
 router.get('/apiarios', ApiariosController.listarApiarios); 
 router.post('/apiarios', ApiariosController.cadastrarApiarios); 
 router.patch('/apiarios/:Apia_Id', ApiariosController.editarApiarios); 
-router.delete('/apiarios/:Apia_Id', ApiariosController.apagarApiarios); 
 router.delete('/apiarios/del/:Apia_Id', ApiariosController.ocultarApiarios);
 
 
@@ -123,10 +122,10 @@ router.delete('/galeria', GaleriaController.apagarGaleria);
 const PropriedadeController = require('../controllers/propriedade'); 
 
 router.get('/propriedade', PropriedadeController.listarPropriedade); 
-router.get('/propriedade/:id', PropriedadeController.listarPropriedadePorId);
 router.post('/propriedade', PropriedadeController.cadastrarPropriedade); 
-router.patch('/propriedade', PropriedadeController.editarPropriedade); 
-router.delete('/propriedade', PropriedadeController.apagarPropriedade); 
+router.patch('/propriedade/:Prop_Id', PropriedadeController.editarPropriedade); 
+router.delete('/propriedade/del/:Prop_Id', PropriedadeController.ocultarPropriedade);
+
 
 
 
