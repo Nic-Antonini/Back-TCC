@@ -58,11 +58,11 @@ module.exports = {
 
             const {Con_Id} = request.params;
 
-            const sql = `UPDATE conexao SET Usu_Id=?, Con_Salvar= ?`;
+            const sql = `UPDATE conexao SET Usu_Id=?, Con_Salvar= ? WHERE Con_Id = ?`;
 
             const values = [Usu_Id, Con_Salvar, Con_Id];
 
-            const atualizaDados = await db.query(slq, values);
+            const atualizaDados = await db.query(sql, values);
             
             return response.status(200).json({
                 sucesso: true, 

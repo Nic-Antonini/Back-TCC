@@ -54,11 +54,11 @@ module.exports = {
 
             const {Gale_Id} = request.params;
 
-            const sql = `UPDATE galeria SET Usu_Id=?, Gale_Foto= ?`;
+            const sql = `UPDATE galeria SET Usu_Id=?, Gale_Foto= ? WHERE Gale_Id = ?`;
 
             const values = [Usu_Id, Gale_Foto, Gale_Id];
 
-            const atualizaDados = await db.query(slq, values);
+            const atualizaDados = await db.query(sql, values);
             
 
             return response.status(200).json({

@@ -56,16 +56,16 @@ module.exports = {
 
             const {Adm_Id} = request.params;
 
-            const sql = `UPDATE administrador SET Adm_Id = ?`;
+            const sql = `UPDATE administrador SET Adm_Id = ? WHERE Adm_Id =?`;
 
-            const values = [Adm_Id];
+            const values = [adm_Id, Adm_Id];
 
             const atualizaDados = await db.query(sql, values);
 
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'editar Administrador.', 
-                dados: adm_Id
+                dados: atualizaDados[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
