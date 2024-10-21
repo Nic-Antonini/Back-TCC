@@ -64,8 +64,8 @@ const ColmeiaController = require('../controllers/colmeia');
 router.get('/colmeia', ColmeiaController.listarColmeia); 
 //router.get('/colmeia/:id', ColmeiaController.listarColmeiaPorId);
 router.post('/colmeia', ColmeiaController.cadastrarColmeia); 
-router.patch('/colmeia', ColmeiaController.editarColmeia); 
-router.delete('/colmeia', ColmeiaController.apagarColmeia); 
+router.patch('/colmeia/:Colm_Id', ColmeiaController.editarColmeia); 
+router.delete('/colmeia/del/:Colm_Id', ColmeiaController.ocultarColmeia); 
 
 
 const ColmeiaEspecieController = require('../controllers/colmeia_especie'); 
@@ -73,8 +73,8 @@ const ColmeiaEspecieController = require('../controllers/colmeia_especie');
 router.get('/colmeia_especie', ColmeiaEspecieController.listarColmeiaEspecie); 
 //router.get('/colmeia_especie/:id', ColmeiaEspecieController.listarColmeiaEspeciePorId);
 router.post('/colmeia_especie', ColmeiaEspecieController.cadastrarColmeiaEspecie); 
-router.patch('/colmeia_especie', ColmeiaEspecieController.editarColmeiaEspecie); 
-router.delete('/colmeia_especie', ColmeiaEspecieController.apagarColmeiaEspecie); 
+router.patch('/colmeia_especie/:Colm_Espe_Id', ColmeiaEspecieController.editarColmeiaEspecie); 
+router.delete('/colmeia_especie/:Colm_Espe_Id', ColmeiaEspecieController.apagarColmeiaEspecie); 
 
 
 const ConexaoController = require('../controllers/conexao'); 
@@ -109,8 +109,8 @@ const EspecieController = require('../controllers/especie');
 router.get('/especie', EspecieController.listarEspecie); 
 //router.get('/especie/:id', EspecieController.listarEspeciePorId);
 router.post('/especie', EspecieController.cadastrarEspecie); 
-router.patch('/especie', EspecieController.editarEspecie); 
-router.delete('/especie', EspecieController.apagarEspecie); 
+router.patch('/especie/:Espe_Id', EspecieController.editarEspecie); 
+router.delete('/especie/:Espe_Id', EspecieController.apagarEspecie); 
 
 
 const GaleriaController = require('../controllers/galeria'); 

@@ -26,7 +26,7 @@ module.exports = {
             
             const {Colm_Id, Espe_Id } = request.body;
 
-            const sql = `INSERT INTO conexao (Colm_Id, Espe_Id) VALUES (?, ?)`;
+            const sql = `INSERT INTO colmeia_especie (Colm_Id, Espe_Id) VALUES (?, ?)`;
 
             const values = [Colm_Id, Espe_Id];
 
@@ -55,11 +55,11 @@ module.exports = {
 
             const {Colm_Espe_Id} = request.params;
 
-            const sql = `UPDATE conexao SET Colm_Id=?, Espe_Id= ?`;
+            const sql = `UPDATE colmeia_especie SET Colm_Id=?, Espe_Id= ? WHERE Colm_Espe_Id=? `;
 
             const values = [Colm_Id, Espe_Id, Colm_Espe_Id];
 
-            const atualizaDados = await db.query(slq, values);
+            const atualizaDados = await db.query(sql, values);
 
             return response.status(200).json({
                 sucesso: true, 
@@ -79,7 +79,7 @@ module.exports = {
             
             const {Colm_Espe_Id} = request.params;
 
-            const sql = `DELETE FROM conexao WHERE Colm_Espe_Id = ?`;
+            const sql = `DELETE FROM colmeia_especie WHERE Colm_Espe_Id = ?`;
 
             const values = [Colm_Espe_Id];
 

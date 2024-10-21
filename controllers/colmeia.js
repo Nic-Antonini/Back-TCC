@@ -26,7 +26,7 @@ module.exports = {
         try { 
             const {Apia_Id } = request.body;
 
-            const sql = `INSERT INTO conexao (Apia_Id) VALUES (?)`;
+            const sql = `INSERT INTO colmeia (Apia_Id) VALUES (?)`;
 
             const values = [Apia_Id];
 
@@ -54,11 +54,11 @@ module.exports = {
 
             const {Colm_Id} = request.params;
 
-            const sql = `UPDATE conexao SET Apia_Id= ?`;
+            const sql = `UPDATE colmeia SET Apia_Id= ? WHERE Colm_Id=?`;
 
             const values = [Apia_Id, Colm_Id];
 
-            const atualizaDados = await db.query(slq, values);
+            const atualizaDados = await db.query(sql, values);
 
             return response.status(200).json({
                 sucesso: true, 
@@ -73,22 +73,21 @@ module.exports = {
             });
         }
     }, 
-    async apagarColmeia(request, response) {
+    async ocultarColmeia(request, response) {
         try {  
-            
+            const Colmeia_Ativo = false;
             const {Colm_Id} = request.params;
-
-            const sql = `DELETE FROM conexao WHERE Colm_Id = ?`;
-
-            const values = [Colm_Id];
-
-            const excluir = await db.query(sql, values);
-
+            const sql = `UPDATE Colmeia SET Colmeia_Ativo = ?
+                WHERE Colm_Id = ?;`;
+            const values = [Colmeia_Ativo, Colm_Id];
+            const atualizacao = await db.query(sql,values);
+    
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Apagar Colmeia.', 
-                dados:  excluir[0].affectedRows
+                mensagem: `Colmeia ${Colm_Id} excluído com sucesso`, 
+                dados: atualizacao[0].affectedRows
             });
+    
         } catch (error) {
             return response.status(500).json({
                 sucesso: false,
@@ -96,5 +95,6 @@ module.exports = {
                 dados: error.message
             });
         }
-    }, 
-};  
+    }
+
+}

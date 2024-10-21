@@ -27,7 +27,7 @@ module.exports = {
             
             const {Espe_Nome } = request.body;
 
-            const sql = `INSERT INTO conexao (Espe_Nome) VALUES (?)`;
+            const sql = `INSERT INTO especie (Espe_Nome) VALUES (?)`;
 
             const values = [Espe_Nome];
 
@@ -55,11 +55,11 @@ module.exports = {
 
             const {Espe_Id} = request.params;
 
-            const sql = `UPDATE conexao SET Espe_Nome= ?`;
+            const sql = `UPDATE especie SET Espe_Nome= ? WHERE Espe_Id=?`;
 
             const values = [Espe_Nome, Espe_Id ];
 
-            const atualizaDados = await db.query(slq, values);
+            const atualizaDados = await db.query(sql, values);
 
             return response.status(200).json({
                 sucesso: true, 
@@ -79,7 +79,7 @@ module.exports = {
             
             const {Espe_Id} = request.params;
 
-            const sql = `DELETE FROM conexao WHERE Espe_Id = ?`;
+            const sql = `DELETE FROM especie WHERE Espe_Id = ?`;
 
             const values = [Espe_Id];
 
