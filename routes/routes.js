@@ -96,10 +96,9 @@ router.delete('/cultivo', CultivoController.apagarCultivo);
 const CultivoPropriedadeController = require('../controllers/cultivo_propriedade'); 
 
 router.get('/cultivo_propriedade', CultivoPropriedadeController.listarCultivoPropriedade); 
-router.get('/cultivo_propriedade/:id', CultivoPropriedadeController.listarCultivoPropriedadePorId);
 router.post('/cultivo_propriedade', CultivoPropriedadeController.cadastrarCultivoPropriedade); 
-router.patch('/cultivo_propriedade', CultivoPropriedadeController.editarCultivoPropriedade); 
-router.delete('/cultivo_propriedade', CultivoPropriedadeController.apagarCultivoPropriedade); 
+router.patch('/cultivo_propriedade/:Cult_Prop_Id', CultivoPropriedadeController.editarCultivoPropriedade); 
+router.delete('/cultivo_propriedade/del/:Cult_Prop_Id', CultivoPropriedadeController.ocultarCultivoPropriedade);
 
 
 const EspecieController = require('../controllers/especie'); 

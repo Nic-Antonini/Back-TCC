@@ -32,32 +32,6 @@ module.exports = {
     }, 
 
 
-
-    async listarApiarioPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const apiarios = await db('Apiário').where('id', id).first();
-            if (!apiarios) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Apiário não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Apiário encontrado.',
-                dados: usuario
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
-
     
     async cadastrarApiarios(request, response) {
         try { 

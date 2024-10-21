@@ -32,30 +32,6 @@ module.exports = {
     },
 
 
-    async listarApicultorPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const Apicultor = await db('Apicultor').where('id', id).first();
-            if (!Apicultor) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Apicultor não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Apicultor encontrado.',
-                dados: Apicultor
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
 
 
     async cadastrarApicultor(request, response) {
