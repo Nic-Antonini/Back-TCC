@@ -2,12 +2,26 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarPropriedade(request, response) {
-        try {            
+        try {     
+            const sql = `SELECT
+                Prop_Id, Prop_Nome, Prop_Hectare,
+                Prop_Cidade, Prop_Estado, Prop_Lat,
+                Prop_Lng, Agri_Id
+                FROM Propriedade
+                WHERE Prop_Ativo = 1;`;     
+                
+            const Propriedade = await db.query(sql);
+
+            const nItens = Propriedade[0].length;
+
+
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Lista de Propriedade.', 
-                dados: null
+                mensagem: 'Lista de Propriedades.', 
+                dados: Propriedade[0],
+                nItens
             });
+            
         } catch (error) {
             return response.status(500).json({
                 sucesso: false,
@@ -16,6 +30,9 @@ module.exports = {
             });
         }
     }, 
+
+
+
     async listarPropriedadePorId(request, response) {
         try {
             const id = request.params.id;
@@ -29,8 +46,8 @@ module.exports = {
             }
             return response.status(200).json({
                 sucesso: true,
-                mensagem: 'Propriedade encontrado.',
-                dados: agricultor
+                mensagem: 'Propriedade encontrada.',
+                dados: propriedade
             });
         } catch (error) {
             return response.status(500).json({
@@ -40,12 +57,30 @@ module.exports = {
             });
         }
     },
+
+    
     async cadastrarPropriedade(request, response) {
-        try {            
+        try { 
+            const {Prop_Nome, Prop_Hectare, Prop_Cidade, Prop_Estado, 
+                Prop_Lat,    Prop_Lng, Agri_Id
+            } = request.body;
+            
+            const sql = `INSERT INTO Propriedade
+                (Prop_Nome, Prop_Hectare, Prop_Cidade, Prop_Estado, 
+                Prop_Lat,    Prop_Lng, Agri_Id)
+                VALUES (?,?,?,?,?,?,?)`;
+                
+
+            const values = [Prop_Nome, Prop_Hectare, Prop_Cidade, Prop_Estado, 
+                Prop_Lat,    Prop_Lng, Agri_Id]
+            const execSql = await db.query(sql,values);
+            const Prop_Id = execSql[0].insertId;
+
+
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Cadastro de Propriedade.', 
-                dados: null
+                mensagem: 'Cadastro de Propriedades.', 
+                dados: Prop_Id
             });
         } catch (error) {
             return response.status(500).json({
@@ -55,13 +90,29 @@ module.exports = {
             });
         }
     }, 
+    
+
     async editarPropriedade(request, response) {
-        try {            
+        try {    
+            const {Prop_Nome, Prop_Hectare, Prop_Cidade, Prop_Estado, 
+                Prop_Lat, Prop_Lng,Prop_Ativo,  Agri_Id
+            } = request.body;
+            const {Prop_Id} = request.params;
+            const sql= `UPDATE Propriedade SET Prop_Nome = ?,  Prop_Hectare = ?, Prop_Cidade = ?, Prop_Estado = ?,
+             Prop_Lat = ?, Prop_Lng = ?,  Prop_Ativo = ?, Agri_Id = ?
+                        WHERE Prop_Id = ?;`;
+
+            const values = [Prop_Nome, Prop_Hectare, Prop_Cidade, Prop_Estado, 
+                Prop_Lat, Prop_Lng,Prop_Ativo,  Agri_Id, Prop_Id];
+            const atualizaDados = await db.query (sql, values);
+
+        
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'editar Propriedade.', 
-                dados: null
+                mensagem: `Propriedade ${Prop_Id} atualizado com sucesso!`, 
+                dados: atualizaDados[0].affectedRows
             });
+
         } catch (error) {
             return response.status(500).json({
                 sucesso: false,
@@ -70,13 +121,25 @@ module.exports = {
             });
         }
     }, 
-    async apagarPropriedade(request, response) {
-        try {            
+
+
+
+
+    async ocultarPropriedade(request, response) {
+        try {  
+            const Prop_Ativo = false;
+            const {Prop_Id} = request.params;
+            const sql = `UPDATE Propriedade SET Prop_Ativo = ?
+                WHERE Prop_Id = ?;`;
+            const values = [Prop_Ativo, Prop_Id];
+            const atualizacao = await db.query(sql,values);
+    
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Apagar Propriedade.', 
-                dados: null
+                mensagem: `Propriedade ${Prop_Id} excluída com sucesso`, 
+                dados: atualizacao[0].affectedRows
             });
+    
         } catch (error) {
             return response.status(500).json({
                 sucesso: false,
@@ -84,5 +147,5 @@ module.exports = {
                 dados: error.message
             });
         }
-    }, 
-};  
+    }
+    }

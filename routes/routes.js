@@ -10,53 +10,50 @@ const UsuariosController = require('../controllers/usuarios');
 
 router.get('/usuarios', UsuariosController.listarUsuarios); 
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
-router.patch('/usuarios', UsuariosController.editarUsuarios); 
-router.delete('/usuarios', UsuariosController.apagarUsuarios); 
+router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
+router.delete('/usuarios/:Usu_Id', UsuariosController.apagarUsuarios); 
+router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
 
 
 const AdministradorController = require('../controllers/administrador'); 
 
-router.get('/administrador', AdministradorController.listarAdministradores); 
-router.get('/administrador/:id', AdministradorController.listarAdministradorPorId); 
-router.post('/administrador', AdministradorController.cadastrarAdministrador); 
-router.patch('/administrador', AdministradorController.editarAdministrador); 
-router.delete('/administrador', AdministradorController.apagarAdministrador); 
+router.get('/administrador', AdministradorController.listarAdministrador); 
+router.post('/administrador', AdministradorController.cadastrarAdministrador);  
+router.patch('/administrador/:Adm_Id', AdministradorController.editarAdministrador); 
+router.delete('/administrador/:Usu_Id', AdministradorController.apagarAdministrador);
+
 
 
 const ApicultorController = require('../controllers/apicultor'); 
 
-router.get('/apicultor',ApicultorController.listarApicultores);
-router.get('/apicultor/:id', ApicultorController.listarApicultorPorId); 
-router.post('/apicultor', ApicultorController.cadastrarApicultores); 
-router.patch('/apicultor', ApicultorController.editarApicultores); 
-router.delete('/apicultor', ApicultorController.apagarApicultores); 
+router.get('/apicultor', ApicultorController.listarApicultor); 
+router.post('/apicultor', ApicultorController.cadastrarApicultor);  
+router.patch('/apicultor/:Apic_Id', ApicultorController.editarApicultor); 
+router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
 
 
 const AgricultorController = require('../controllers/agricultor'); 
 
-router.get('/agricultor', AgricultorController.listarAgricultores);
-router.get('/agricultor/:id', AgricultorController.listarAgricultorPorId);  
-router.post('/agricultor', AgricultorController.cadastrarAgricultor); 
-router.patch('/agricultor', AgricultorController.editarAgricultores); 
-router.delete('/agricultor', AgricultorController.apagarAgricultores); 
+router.get('/agricultor', AgricultorController.listarAgricultor); 
+router.post('/agricultor', AgricultorController.cadastrarAgricultor);  
+router.patch('/agricultor/:Agri_Id', AgricultorController.editarAgricultor); 
+router.delete('/agricultor/:Usu_Id', AgricultorController.apagarAgricultor);
 
+const ApiariosController = require('../controllers/apiarios'); 
 
-const ApiarioController = require('../controllers/apiarios'); 
+router.get('/apiarios', ApiariosController.listarApiarios); 
+router.post('/apiarios', ApiariosController.cadastrarApiarios); 
+router.patch('/apiarios/:Apia_Id', ApiariosController.editarApiarios); 
+router.delete('/apiarios/del/:Apia_Id', ApiariosController.ocultarApiarios);
 
-router.get('/apiarios', ApiarioController.listarApiarios); 
-router.get('/apiarios/:id', ApiarioController.listarApiariosPorId);
-router.post('/apiarios', ApiarioController.cadastrarApiarios); 
-router.patch('/apiarios', ApiarioController.editarApiarios); 
-router.delete('/apiarios', ApiarioController.apagarApiarios); 
 
 
 const ChatController = require('../controllers/chat'); 
 
-router.get('/chat', ChatController.listarChats);
-router.get('/chat/:id', ChatController.listarChatsPorId);
-router.post('/chat', ChatController.cadastrarChats); 
-router.patch('/chat', ChatController.editarChats); 
-router.delete('/chat', ChatController.apagarChats);
+router.get('/chat', ChatController.listarChat); 
+router.post('/chat', ChatController.cadastrarChat); 
+router.patch('/chat/:Chat_Id', ChatController.editarChat); 
+router.delete('/chat/del/:Chat_Id', ChatController.ocultarChat);
 
 
 const ColmeiaController = require('../controllers/colmeia'); 
@@ -89,19 +86,18 @@ router.delete('/conexao', ConexaoController.apagarConexao);
 const CultivoController = require('../controllers/cultivo'); 
 
 router.get('/cultivo', CultivoController.listarCultivo); 
-router.get('/cultivo/:id', CultivoController.listarCultivoPorId);
 router.post('/cultivo', CultivoController.cadastrarCultivo); 
-router.patch('/cultivo', CultivoController.editarCultivo); 
-router.delete('/cultivo', CultivoController.apagarCultivo); 
+router.patch('/cultivo/:Cult_Id', CultivoController.editarCultivo); 
+router.delete('/cultivo/del/:Cult_Id', CultivoController.ocultarCultivo);
+
 
 
 const CultivoPropriedadeController = require('../controllers/cultivo_propriedade'); 
 
 router.get('/cultivo_propriedade', CultivoPropriedadeController.listarCultivoPropriedade); 
-router.get('/cultivo_propriedade/:id', CultivoPropriedadeController.listarCultivoPropriedadePorId);
 router.post('/cultivo_propriedade', CultivoPropriedadeController.cadastrarCultivoPropriedade); 
-router.patch('/cultivo_propriedade', CultivoPropriedadeController.editarCultivoPropriedade); 
-router.delete('/cultivo_propriedade', CultivoPropriedadeController.apagarCultivoPropriedade); 
+router.patch('/cultivo_propriedade/:Cult_Prop_Id', CultivoPropriedadeController.editarCultivoPropriedade); 
+router.delete('/cultivo_propriedade/del/:Cult_Prop_Id', CultivoPropriedadeController.ocultarCultivoPropriedade);
 
 
 const EspecieController = require('../controllers/especie'); 
@@ -124,10 +120,10 @@ router.delete('/galeria', GaleriaController.apagarGaleria);
 const PropriedadeController = require('../controllers/propriedade'); 
 
 router.get('/propriedade', PropriedadeController.listarPropriedade); 
-router.get('/propriedade/:id', PropriedadeController.listarPropriedadePorId);
 router.post('/propriedade', PropriedadeController.cadastrarPropriedade); 
-router.patch('/propriedade', PropriedadeController.editarPropriedade); 
-router.delete('/propriedade', PropriedadeController.apagarPropriedade); 
+router.patch('/propriedade/:Prop_Id', PropriedadeController.editarPropriedade); 
+router.delete('/propriedade/del/:Prop_Id', PropriedadeController.ocultarPropriedade);
+
 
 
 
