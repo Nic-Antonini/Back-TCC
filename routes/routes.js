@@ -50,11 +50,10 @@ router.delete('/apiarios/del/:Apia_Id', ApiariosController.ocultarApiarios);
 
 const ChatController = require('../controllers/chat'); 
 
-router.get('/chat', ChatController.listarChats);
-router.get('/chat/:id', ChatController.listarChatsPorId);
-router.post('/chat', ChatController.cadastrarChats); 
-router.patch('/chat', ChatController.editarChats); 
-router.delete('/chat', ChatController.apagarChats);
+router.get('/chat', ChatController.listarChat); 
+router.post('/chat', ChatController.cadastrarChat); 
+router.patch('/chat/:Chat_Id', ChatController.editarChat); 
+router.delete('/chat/del/:Chat_Id', ChatController.ocultarChat);
 
 
 const ColmeiaController = require('../controllers/colmeia'); 
@@ -87,10 +86,10 @@ router.delete('/conexao', ConexaoController.apagarConexao);
 const CultivoController = require('../controllers/cultivo'); 
 
 router.get('/cultivo', CultivoController.listarCultivo); 
-router.get('/cultivo/:id', CultivoController.listarCultivoPorId);
 router.post('/cultivo', CultivoController.cadastrarCultivo); 
-router.patch('/cultivo', CultivoController.editarCultivo); 
-router.delete('/cultivo', CultivoController.apagarCultivo); 
+router.patch('/cultivo/:Cult_Id', CultivoController.editarCultivo); 
+router.delete('/cultivo/del/:Cult_Id', CultivoController.ocultarCultivo);
+
 
 
 const CultivoPropriedadeController = require('../controllers/cultivo_propriedade'); 
