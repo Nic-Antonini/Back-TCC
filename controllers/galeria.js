@@ -2,11 +2,16 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarGaleria(request, response) {
-        try {            
+        try {    
+            
+            const sql = `SELECT Gale_Id, Gale_Foto, Usu_Id FROM galeria`;
+
+            const galeria = await db.query(sql);
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Galeria.', 
-                dados: null
+                dados: galeria[0]
             });
         } catch (error) {
             return response.status(500).json({
@@ -16,36 +21,23 @@ module.exports = {
             });
         }
     }, 
-    async listarGaleriaPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const galeria = await db('Galeria').where('id', id).first();
-            if (!galeria) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Galeria não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Galeria encontrado.',
-                dados: agricultor
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
     async cadastrarGaleria(request, response) {
-        try {            
+        try {  
+            
+            const {Usu_Id, Gale_Foto} = request.body;
+
+            const sql = `INSERT INTO galeria (Usu_Id, Gale_Foto) VALUES (?, ?)`;
+
+            const values = [Usu_Id, Gale_Foto ];
+
+            const execSql = await db.query(sql, values);
+
+            const Gale_Id = execSql[0].insertId;
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de Galeria.', 
-                dados: null
+                dados:Gale_Id
             });
         } catch (error) {
             return response.status(500).json({
@@ -56,11 +48,23 @@ module.exports = {
         }
     }, 
     async editarGaleria(request, response) {
-        try {            
+        try { 
+            
+            const {Usu_Id, Gale_Foto}= request.body;
+
+            const {Gale_Id} = request.params;
+
+            const sql = `UPDATE galeria SET Usu_Id=?, Gale_Foto= ? WHERE Gale_Id = ?`;
+
+            const values = [Usu_Id, Gale_Foto, Gale_Id];
+
+            const atualizaDados = await db.query(sql, values);
+            
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'editar Galeria.', 
-                dados: null
+                dados:atualizaDados[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
@@ -71,11 +75,21 @@ module.exports = {
         }
     }, 
     async apagarGaleria(request, response) {
-        try {            
+        try {    
+            
+            const {Gale_Id} = request.params;
+
+            const sql = `DELETE FROM galeria WHERE Gale_Id = ?`;
+
+            const values = [Gale_Id];
+
+            const excluir = await db.query(sql, values);
+
+
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Apagar Galeria.', 
-                dados: null
+                dados: excluir[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
