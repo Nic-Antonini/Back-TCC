@@ -56,22 +56,14 @@ router.patch('/chat/:Chat_Id', ChatController.editarChat);
 router.delete('/chat/del/:Chat_Id', ChatController.ocultarChat);
 
 
-const ColmeiaController = require('../controllers/colmeia'); 
 
-router.get('/colmeia', ColmeiaController.listarColmeia); 
-router.get('/colmeia/:id', ColmeiaController.listarColmeiaPorId);
-router.post('/colmeia', ColmeiaController.cadastrarColmeia); 
-router.patch('/colmeia', ColmeiaController.editarColmeia); 
-router.delete('/colmeia', ColmeiaController.apagarColmeia); 
+const EspecieApiarioController = require('../controllers/especie_apiario'); 
 
+router.get('/especie_apiario', EspecieApiarioController.listarEspecieApiario); 
+router.post('/especie_apiario', EspecieApiarioController.cadastrarEspecieApiario); 
+router.patch('/especie_apiario/:Espe_Apia_Id', EspecieApiarioController.editarEspecieApiario); 
+router.delete('/especie_apiario/del/:Espe_Apia_Id', EspecieApiarioController.ocultarEspecieApiario);
 
-const ColmeiaEspecieController = require('../controllers/colmeia_especie'); 
-
-router.get('/colmeia_especie', ColmeiaEspecieController.listarColmeiaEspecie); 
-router.get('/colmeia_especie/:id', ColmeiaEspecieController.listarColmeiaEspeciePorId);
-router.post('/colmeia_especie', ColmeiaEspecieController.cadastrarColmeiaEspecie); 
-router.patch('/colmeia_especie', ColmeiaEspecieController.editarColmeiaEspecie); 
-router.delete('/colmeia_especie', ColmeiaEspecieController.apagarColmeiaEspecie); 
 
 
 const ConexaoController = require('../controllers/conexao'); 
