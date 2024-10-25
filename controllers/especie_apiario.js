@@ -31,31 +31,33 @@ module.exports = {
 
 
     async cadastrarEspecieApiario(request, response) {
-        try { 
-            const {Cult_Id, Prop_Id} = request.body;
-            
-            const sql = `INSERT INTO Cultivo_Propriedade
-                (Cult_Id, Prop_Id)
-                VALUES (?,?)`;
-
-            const values = [Cult_Id, Prop_Id]
-            const execSql = await db.query(sql,values);
-            const Cult_Prop_Id = execSql[0].insertId;
-
-
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: 'Cadastro de CultivoPropriedade.', 
-                dados: Cult_Prop_Id
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
+            try { 
+                const {Apia_Id, Espe_Id, Espe_Apia_Ativo} = request.body;
+                
+                const sql = `INSERT INTO Apiarios
+                    (Apia_Id, Espe_Id, Espe_Apia_Ativo)
+                    VALUES (?,?,?,?)`;
+                    
+    
+                const values = [Apia_Id, Espe_Id, Espe_Apia_Ativo]
+                const execSql = await db.query(sql,values);
+                const Espe_Apia_Id = execSql[0].insertId;
+    
+    
+                return response.status(200).json({
+                    sucesso: true, 
+                    mensagem: 'Cadastro de Apiários.', 
+                    dados: Apia_Id
+                });
+            } catch (error) {
+                return response.status(500).json({
+                    sucesso: false,
+                    mensagem: 'Erro na requisição.',
+                    dados: error.message
+                });
+            }
+        }, 
+        
     
     async editarEspecieApiario(request, response) {
         try {    
