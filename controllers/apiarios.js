@@ -2,11 +2,19 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarApiarios(request, response) {
-        try {            
+        try {  
+            
+            //instruções SQL
+            const sql = `SELECT Apia_Id, Apia_Nome, Apia_Lat,
+             Apia_Lng, Apia_Cidade, Apia_Estado, Apia_Caixas, Apic_Id from apiarios`;
+
+            //função que executa as intruções sql (função que armazena o resultado em uma const)
+            const apiarios = await db.query(sql)
+            
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Apiarios.', 
-                dados: null
+                dados: apiarios[0]
             });
         } catch (error) {
             return response.status(500).json({
