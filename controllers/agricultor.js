@@ -125,29 +125,4 @@ module.exports = {
             });
         }
     },
-
-
-    // async ocultarAgricultor(request, response) {
-    //     try {
-    //         const Agri_Ativo = false;
-    //         const { Agri_Id } = request.params;
-    //         const sql = `UPDATE Agricultor SET Agri_Ativo = ?
-    //         WHERE Agri_Id = ?;`;
-    //         const values = [Agri_Ativo, Agri_Id];
-    //         const atualizacao = await db.query(sql, values);
-
-    //         return response.status(200).json({
-    //             sucesso: true,
-    //             mensagem: `Agricultor ${Agri_Id} excluído com sucesso`,
-    //             dados: atualizacao[0].affectedRows
-    //         });
-
-    //     } catch (error) {
-    //         return response.status(500).json({
-    //             sucesso: false,
-    //             mensagem: 'Erro na requisição.',
-    //             dados: error.message
-    //         });
-    //     }
-    // }
 }

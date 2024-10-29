@@ -11,16 +11,7 @@ const UsuariosController = require('../controllers/usuarios');
 router.get('/usuarios', UsuariosController.listarUsuarios); 
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
 router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
-router.delete('/usuarios/:Usu_Id', UsuariosController.apagarUsuarios); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
-
-
-const AdministradorController = require('../controllers/administrador'); 
-
-router.get('/administrador', AdministradorController.listarAdministrador); 
-router.post('/administrador', AdministradorController.cadastrarAdministrador);  
-router.patch('/administrador/:Adm_Id', AdministradorController.editarAdministrador); 
-router.delete('/administrador/:Usu_Id', AdministradorController.apagarAdministrador);
 
 
 const ApicultorController = require('../controllers/apicultor'); 

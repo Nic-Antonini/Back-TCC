@@ -87,28 +87,6 @@ module.exports = {
     }, 
 
     
-    async apagarUsuarios(request, response) {
-        try {  
-            const {Usu_Id} = request.params;
-            const sql = `DELETE FROM Usuario WHERE Usu_Id = ?`;
-            const values = [Usu_Id]     
-            const excluir = await db.query (sql, values);
-
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: `Usuário ${Usu_Id} excluído com sucesso`, 
-                dados: excluir [0].affectedRows
-            });
-
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
-
 
 async ocultarUsuario(request, response) {
     try {  
