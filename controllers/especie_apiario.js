@@ -31,48 +31,50 @@ module.exports = {
 
 
     async cadastrarEspecieApiario(request, response) {
-            try { 
-                const {Apia_Id, Espe_Id, Espe_Apia_Ativo} = request.body;
+        try { 
+            const {Apia_Id, Espe_Id} = request.body;
+            
+            const sql = `INSERT INTO Especie_Apiario
+                (Apia_Id, Espe_Id)
+                VALUES (?,?)`;
+
                 
-                const sql = `INSERT INTO Apiarios
-                    (Apia_Id, Espe_Id, Espe_Apia_Ativo)
-                    VALUES (?,?,?,?)`;
-                    
+
+            const values = [Apia_Id, Espe_Id]
+            const execSql = await db.query(sql,values);
+            const Espe_Apia_Id = execSql[0].insertId;
+
+
+            return response.status(200).json({
+                sucesso: true, 
+                mensagem: 'Cadastro de Especie Apiario.', 
+                dados: Espe_Apia_Id
+            });
+        } catch (error) {
+            return response.status(500).json({
+                sucesso: false,
+                mensagem: 'Erro na requisição.',
+                dados: error.message
+            });
+        }
+    }, 
     
-                const values = [Apia_Id, Espe_Id, Espe_Apia_Ativo]
-                const execSql = await db.query(sql,values);
-                const Espe_Apia_Id = execSql[0].insertId;
-    
-    
-                return response.status(200).json({
-                    sucesso: true, 
-                    mensagem: 'Cadastro de Apiários.', 
-                    dados: Apia_Id
-                });
-            } catch (error) {
-                return response.status(500).json({
-                    sucesso: false,
-                    mensagem: 'Erro na requisição.',
-                    dados: error.message
-                });
-            }
-        }, 
         
     
     async editarEspecieApiario(request, response) {
         try {    
-            const {Cult_Id, Prop_Id, Cult_Prop_Ativo } = request.body;
-            const {Cult_Prop_Id} = request.params;
-            const sql= `UPDATE Cultivo_Propriedade SET Cult_Id = ?, Prop_Id = ?, Cult_Prop_Ativo = ?
-                        WHERE Cult_Prop_Id = ?;`;
+            const {Apia_Id, Espe_Id, Espe_Apia_Ativo} = request.body;
+            const {Espe_Apia_Id} = request.params;
+            const sql= `UPDATE Especie_Apiario SET Apia_Id = ?,  Espe_Id = ?, Espe_Apia_Ativo = ?
+                        WHERE Espe_Apia_Id = ?;`;
 
-            const values = [Cult_Id, Prop_Id, Cult_Prop_Ativo, Cult_Prop_Id];
+            const values = [Apia_Id, Espe_Id, Espe_Apia_Ativo, Espe_Apia_Id ];
             const atualizaDados = await db.query (sql, values);
 
         
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: `CultivoPropriedade ${Cult_Prop_Id} atualizado com sucesso!`, 
+                mensagem: `Especie Apiario ${Espe_Apia_Id} atualizado com sucesso!`, 
                 dados: atualizaDados[0].affectedRows
             });
 
@@ -85,18 +87,19 @@ module.exports = {
         }
     }, 
 
+
     async ocultarEspecieApiario(request, response) {
         try {  
-            const Cult_Prop_Ativo = false;
-            const {Cult_Prop_Id} = request.params;
-            const sql = `UPDATE Cultivo_Propriedade SET Cult_Prop_Ativo = ?
-                WHERE Cult_Prop_Id = ?;`;
-            const values = [Cult_Prop_Ativo, Cult_Prop_Id];
+            const Espe_Apia_Ativo = false;
+            const {Espe_Apia_Id} = request.params;
+            const sql = `UPDATE Especie_Apiario SET Espe_Apia_Ativo = ?
+                WHERE Espe_Apia_Id = ?;`;
+            const values = [Espe_Apia_Ativo, Espe_Apia_Id];
             const atualizacao = await db.query(sql,values);
     
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: `CultivoPropriedade ${Cult_Prop_Id} excluído com sucesso`, 
+                mensagem: `Especie Apiario ${Espe_Apia_Id} excluído com sucesso`, 
                 dados: atualizacao[0].affectedRows
             });
     
@@ -108,5 +111,4 @@ module.exports = {
             });
         }
     }
-
     }

@@ -32,30 +32,6 @@ module.exports = {
     },
 
 
-    async listarAgricultorPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const Agricultor = await db('Agricultor').where('id', id).first();
-            if (!Agricultor) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Agricultor não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Agricultor encontrado.',
-                dados: Agricultor
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
 
 
     async cadastrarAgricultor(request, response) {

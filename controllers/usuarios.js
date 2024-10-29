@@ -30,30 +30,6 @@ module.exports = {
         }
     }, 
 
-    async listarUsuarioPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const usuario = await db('Usuario').where('id', id).first();
-            if (!usuario) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Usuario não encontrado.',
-                    dados: null
-                });
-            }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Usuario encontrado.',
-                dados: usuario
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
 
     
     async cadastrarUsuarios(request, response) {

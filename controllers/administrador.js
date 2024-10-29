@@ -2,59 +2,34 @@ const db = require('../database/connection');
 
 module.exports = {
     async listarAdministrador(request, response) {
-        try {
-            const sql = `SELECT
-            Ad.Adm_Id, us.Usu_NomeCompleto
-            FROM Administrador ad 
-            INNER JOIN usuario us ON us.Usu_Id = Ad.Adm_Id 
-            WHERE us.Usu_Ativo = 1;`;
-
-            const Administrador = await db.query(sql);
-
-            const nItens = Administrador[0].length;
-
-
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Lista de Administradores.',
-                dados: Administrador[0],
-                nItens
-            });
-
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
-
-
-    async listarAdministradorPorId(request, response) {
-        try {
-            const id = request.params.id;
-            const Administrador = await db('Administrador').where('id', id).first();
-            if (!Administrador) {
-                return response.status(404).json({
+            try {
+                const sql = `SELECT
+                adm.Adm_Id, us.Usu_NomeCompleto, adm.Usu_Id
+                FROM Administrador adm 
+                INNER JOIN usuario us ON us.Usu_Id = adm.Usu_Id 
+                WHERE us.Usu_Ativo = 1;`;
+    
+                const Administrador = await db.query(sql);
+    
+                const nItens = Administrador[0].length;
+    
+    
+                return response.status(200).json({
+                    sucesso: true,
+                    mensagem: 'Lista de Administrador.',
+                    dados: Administrador[0],
+                    nItens
+                });
+    
+            } catch (error) {
+                return response.status(500).json({
                     sucesso: false,
-                    mensagem: 'Administrador não encontrado.',
-                    dados: null
+                    mensagem: 'Erro na requisição.',
+                    dados: error.message
                 });
             }
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Administrador encontrado.',
-                dados: Administrador
-            });
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    },
+        },
+
 
 
     async cadastrarAdministrador(request, response) {
@@ -69,10 +44,10 @@ module.exports = {
 
             const values = [Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo]
             const execSql = await db.query(sql,values);
-            const Usu_Id = execSql[0].insertId;            
+            const Usu_id = execSql[0].insertId;            
 
             const sql2 = `INSERT INTO Administrador
-                (Adm_Id)
+                (Usu_Id)
                 VALUES (?)`;
 
 
@@ -95,6 +70,7 @@ module.exports = {
             });
         }
     },
+
 
 
     //CORRIGIR EDITAR E APAGAR ADMINISTRADOR!!!!!

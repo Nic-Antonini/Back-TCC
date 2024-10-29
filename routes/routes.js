@@ -23,7 +23,6 @@ router.patch('/administrador/:Adm_Id', AdministradorController.editarAdministrad
 router.delete('/administrador/:Usu_Id', AdministradorController.apagarAdministrador);
 
 
-
 const ApicultorController = require('../controllers/apicultor'); 
 
 router.get('/apicultor', ApicultorController.listarApicultor); 
@@ -69,10 +68,11 @@ router.delete('/especie_apiario/del/:Espe_Apia_Id', EspecieApiarioController.ocu
 const ConexaoController = require('../controllers/conexao'); 
 
 router.get('/conexao', ConexaoController.listarConexao); 
-router.get('/conexao/:id', ConexaoController.listarConexaoPorId);
 router.post('/conexao', ConexaoController.cadastrarConexao); 
-router.patch('/conexao', ConexaoController.editarConexao); 
-router.delete('/conexao', ConexaoController.apagarConexao); 
+router.patch('/conexao/:Con_Id', ConexaoController.editarConexao); 
+router.delete('/conexao/:Con_Id', ConexaoController.apagarConexao); 
+
+
 
 
 const CultivoController = require('../controllers/cultivo'); 
