@@ -36,7 +36,7 @@ module.exports = {
     async cadastrarApiarios(request, response) {
         try { 
             const {Apia_Nome, Apia_Cidade, Apia_Estado, Apia_Lat, 
-                Apia_Lng,    Apia_Caixas, Apic_Id
+                Apia_Lng,   Apia_Caixas, Apic_Id
             } = request.body;
             
             const sql = `INSERT INTO Apiarios

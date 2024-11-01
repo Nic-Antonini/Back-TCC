@@ -4,7 +4,7 @@ module.exports = {
     async listarCultivo(request, response) {
         try {     
             const sql = `SELECT
-                Cult_Id, Cult_Nome, Cult_Agrotoxico = 1 AS Cult_Agrotoxico,
+                Cult_Id, Cult_Nome,
                 Cult_Ativo, Prop_Id
                 FROM Cultivo
                 WHERE Cult_Ativo = 1;`;     
@@ -36,14 +36,14 @@ module.exports = {
     
     async cadastrarCultivo(request, response) {
             try { 
-                const {Cult_Nome, Cult_Agrotoxico, Prop_Id} = request.body;
+                const {Cult_Nome, Prop_Id} = request.body;
                 
                 const sql = `INSERT INTO Cultivo
-                    (Cult_Nome, Cult_Agrotoxico, Prop_Id)
-                    VALUES (?,?,?)`;
+                    (Cult_Nome, Prop_Id)
+                    VALUES (?,?)`;
                     
     
-                const values = [Cult_Nome, Cult_Agrotoxico, Prop_Id]
+                const values = [Cult_Nome, Prop_Id]
                 const execSql = await db.query(sql,values);
                 const Cult_Id = execSql[0].insertId;
     
@@ -67,12 +67,12 @@ module.exports = {
 
     async editarCultivo(request, response) {
             try {    
-                const {Cult_Nome, Cult_Agrotoxico, Cult_Ativo, Prop_Id } = request.body;
+                const {Cult_Nome, Cult_Ativo, Prop_Id } = request.body;
                 const {Cult_Id} = request.params;
-                const sql= `UPDATE Cultivo SET Cult_Nome = ?,  Cult_Agrotoxico = ?, Cult_Ativo = ?, Prop_Id = ?
+                const sql= `UPDATE Cultivo SET Cult_Nome = ?, Cult_Ativo = ?, Prop_Id = ?
                             WHERE Cult_Id = ?;`;
     
-                const values = [Cult_Nome, Cult_Agrotoxico, Cult_Ativo, Prop_Id, Cult_Id];
+                const values = [Cult_Nome, Cult_Ativo, Prop_Id, Cult_Id];
                 const atualizaDados = await db.query (sql, values);
     
             

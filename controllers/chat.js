@@ -55,8 +55,8 @@ module.exports = {
 
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Cadastro de Apiários.', 
-                dados: Chat_Id
+                mensagem: 'Cadastro de Chat.', 
+                dados: Chat_id
             });
         } catch (error) {
             return response.status(500).json({
