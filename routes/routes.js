@@ -95,10 +95,10 @@ router.delete('/especie/:Espe_Id', EspecieController.apagarEspecie);
 const GaleriaController = require('../controllers/galeria'); 
 
 router.get('/galeria', GaleriaController.listarGaleria); 
-router.get('/galeria/:id', GaleriaController.listarGaleriaPorId);
+//router.get('/galeria/:id', GaleriaController.listarGaleriaPorId);
 router.post('/galeria', GaleriaController.cadastrarGaleria); 
 router.patch('/galeria', GaleriaController.editarGaleria); 
-router.delete('/galeria', GaleriaController.apagarGaleria);
+router.delete('/galeria/:Gale_Id', GaleriaController.apagarGaleria);
 
 const PropriedadeController = require('../controllers/propriedade'); 
 
