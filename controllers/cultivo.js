@@ -7,7 +7,8 @@ module.exports = {
                 Cult_Id, Cult_Nome,
                 Cult_Ativo
                 FROM Cultivo
-                WHERE Cult_Ativo = 1;`;     
+                WHERE Cult_Ativo = 1
+                ORDER BY Cult_Nome ASC;`;     
                 
             const Cultivo = await db.query(sql);
 
