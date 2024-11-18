@@ -3,7 +3,8 @@ const db = require('../database/connection');
 module.exports = {
     async listarEspecie(request, response) {
 
-            const sql = `SELECT Espe_Id, Espe_Nome FROM especie`
+            const sql = `SELECT Espe_Id, Espe_Nome, Espe_Ativo FROM Especie
+             WHERE Espe_Ativo = 1 ORDER BY Espe_Nome ASC;`
 
             const especie = await db.query(sql)
 
@@ -27,7 +28,7 @@ module.exports = {
             
             const {Espe_Nome } = request.body;
 
-            const sql = `INSERT INTO especie (Espe_Nome) VALUES (?)`;
+            const sql = `INSERT INTO Especie (Espe_Nome) VALUES (?)`;
 
             const values = [Espe_Nome];
 
@@ -55,7 +56,7 @@ module.exports = {
 
             const {Espe_Id} = request.params;
 
-            const sql = `UPDATE especie SET Espe_Nome= ? WHERE Espe_Id=?`;
+            const sql = `UPDATE Especie SET Espe_Nome= ? WHERE Espe_Id=?`;
 
             const values = [Espe_Nome, Espe_Id ];
 
@@ -79,7 +80,7 @@ module.exports = {
             
             const {Espe_Id} = request.params;
 
-            const sql = `DELETE FROM especie WHERE Espe_Id = ?`;
+            const sql = `DELETE FROM Especie WHERE Espe_Id = ?`;
 
             const values = [Espe_Id];
 
