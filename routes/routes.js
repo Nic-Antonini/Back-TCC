@@ -3,6 +3,7 @@ const router = express.Router(); //armazenando a função Router do módulo expr
 const uploadImageProfile = require('../middleware/uploadProfileImage');
 const uploadImageCover = require('../middleware/uploadProfileCover');
 const uploadChatMidia = require('../middleware/uploadChatMidia');
+const authentication = require('../middleware/authentication');
 
 // referência a controllers que serão utilizados nas rotas
 // post
@@ -15,7 +16,13 @@ router.get('/usuarios', UsuariosController.listarUsuarios);
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
 router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
-
+router.post('/usuarios/login', UsuariosController.login)
+router.get('/protecao', authentication, (req, res) => {
+    return res.status(200).json({
+        sucesso: true,
+        mensagem: 'Você tem acesso à rota protegida.'
+    });
+});
 
 const ApicultorController = require('../controllers/apicultor'); 
 
@@ -95,12 +102,12 @@ router.patch('/especie/:Espe_Id', EspecieController.editarEspecie);
 router.delete('/especie/:Espe_Id', EspecieController.apagarEspecie); 
 
 const PropriedadeController = require('../controllers/propriedade'); 
+const usuarios = require('../controllers/usuarios');
 
 router.get('/propriedade', PropriedadeController.listarPropriedade); 
 router.post('/propriedade', PropriedadeController.cadastrarPropriedade); 
 router.patch('/propriedade/:Prop_Id', PropriedadeController.editarPropriedade); 
 router.delete('/propriedade/del/:Prop_Id', PropriedadeController.ocultarPropriedade);
-
 
 
 

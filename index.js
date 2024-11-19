@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const router = require('./routes/routes');
 
@@ -7,6 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(router)
+
 
 //tornando a pasta public acessível para imagens
 app.use('/public', express.static('public'))
