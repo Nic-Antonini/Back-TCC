@@ -1,4 +1,29 @@
 const db = require('../database/connection');
+const fs = require('fs-extra');
+
+function geraUrl(e) {
+    // garantir que valores em branco carreguem algo
+    let img = e.Agri_Foto_Perfil ? e.Agri_Foto_Perfil : 'farmer.png';
+    // verifica se imagem existe
+    if (!fs.existsSync('./public/upload/profileImage/' + img)) {
+        img = 'beekeeper.jpg';
+    }
+
+    let imgCover = e.Agri_Foto_Capa ? e.Agri_Foto_Capa : 'default-cover.png';
+    if (!fs.existsSync('./public/upload/profileCover/' + imgCover)) {
+        imgCover = 'default-cover.png';
+    }  
+
+    const Agriultor = {
+        Agri: e.Agri_Id,
+        Agri_Foto_Perfil: 'http://10.67.23.6:3333/public/upload/profileImage/' + img,
+        Agri_Foto_Capa: 'http://10.67.23.6:3333/public/upload/profileCover/' + imgCover,
+        Agri_Biografia: e.Agri_Biografia,
+        Usu_Id: e.Usu_Id
+    };
+
+    return Agriultor;
+}
 
 module.exports = {
     async listarAgricultor(request, response) {
@@ -14,11 +39,12 @@ module.exports = {
 
             const nItens = Agricultor[0].length;
 
+            const resultado = Apicultor[0].map(geraUrl);
 
             return response.status(200).json({
                 sucesso: true,
                 mensagem: 'Lista de Agricultores.',
-                dados: Agricultor[0],
+                dados: resultado,
                 nItens
             });
 

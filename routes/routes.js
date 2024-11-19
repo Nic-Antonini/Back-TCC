@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router(); //armazenando a função Router do módulo express dentro de uma const
+const uploadImageProfile = require('../middleware/uploadProfileImage');
+const uploadImageCover = require('../middleware/uploadProfileCover');
+const uploadChatMidia = require('../middleware/uploadChatMidia');
+const authentication = require('../middleware/authentication')
 
 // referência a controllers que serão utilizados nas rotas
 // post
@@ -12,12 +16,19 @@ router.get('/usuarios', UsuariosController.listarUsuarios);
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
 router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
+router.post('/usuarios/login', UsuariosController.login);
+router.get('/protecao', authentication, (req, res) => {
+    return res.status(200).json({
+        sucesso: true,
+        mensagem: 'Você tem acesso à rota protegida.'
+    });
+})
 
 
 const ApicultorController = require('../controllers/apicultor'); 
 
 router.get('/apicultor', ApicultorController.listarApicultor); 
-router.post('/apicultor', ApicultorController.cadastrarApicultor);  
+router.post('/apicultor', uploadImageProfile.single('img'), uploadImageCover.single('imgCover'), ApicultorController.cadastrarApicultor);    
 router.patch('/apicultor/:Apic_Id', ApicultorController.editarApicultor); 
 router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
 
@@ -25,7 +36,7 @@ router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
 const AgricultorController = require('../controllers/agricultor'); 
 
 router.get('/agricultor', AgricultorController.listarAgricultor); 
-router.post('/agricultor', AgricultorController.cadastrarAgricultor);  
+router.post('/agricultor', uploadImageProfile.single('img'), uploadImageCover.single('imgCover'), AgricultorController.cadastrarAgricultor);    
 router.patch('/agricultor/:Agri_Id', AgricultorController.editarAgricultor); 
 router.delete('/agricultor/:Usu_Id', AgricultorController.apagarAgricultor);
 
@@ -41,7 +52,7 @@ router.delete('/apiarios/del/:Apia_Id', ApiariosController.ocultarApiarios);
 const ChatController = require('../controllers/chat'); 
 
 router.get('/chat', ChatController.listarChat); 
-router.post('/chat', ChatController.cadastrarChat); 
+router.post('/chat', uploadChatMidia.single('midia'), ChatController.cadastrarChat);
 router.patch('/chat/:Chat_Id', ChatController.editarChat); 
 router.delete('/chat/del/:Chat_Id', ChatController.ocultarChat);
 

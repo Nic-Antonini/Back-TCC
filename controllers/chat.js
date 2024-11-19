@@ -1,4 +1,22 @@
 const db = require('../database/connection'); 
+const fs = require('fs-extra');
+
+function geraUrl(e) {
+    const midia = e.Chat_Midia ? `http://10.67.23.6:3333/public/upload/Chat/${e.Chat_Midia}` : null;
+
+    const Chat = {
+        Chat_Id: e.Chat_Id,
+        Chat_Mensagem: e.Chat_Mensagem,
+        Chat_Midia: midia,
+        Chat_Dta_Hora: e.Chat_Dta_Hora,
+        Chat_Visto: e.Chat_Visto,
+        Chat_Ativo: e.Chat_Ativo,
+        Apic_Id: e.Apic_Id,
+        Agri_Id: e.Agri_Id,
+    };
+
+    return Chat;
+}
 
 module.exports = {
     async listarChat(request, response) {
@@ -14,11 +32,12 @@ module.exports = {
 
             const nItens = Chat[0].length;
 
+            const resultado = Chat[0].map(geraUrl);
 
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de Chats.', 
-                dados: Chat[0],
+                dados: resultado,
                 nItens
             });
             
