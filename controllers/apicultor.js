@@ -1,30 +1,6 @@
 const db = require('../database/connection');
 const fs = require('fs-extra');
 
-function geraUrl(e) {
-    // garantir que valores em branco carreguem algo
-    let img = e.Apic_Foto_Perfil ? e.Apic_Foto_Perfil : '/beekeeper.png';
-    // verifica se imagem existe
-    if (!fs.existsSync('./public/upload/profileImage/' + img)) {
-        img = '/beekeeper.jpg';
-    }
-
-    let imgCover = e.Apic_Foto_Capa ? e.Apic_Foto_Capa : '/default-cover.png';
-    if (!fs.existsSync('./public/upload/profileCover/' + imgCover)) {
-        imgCover = '/default-cover.png';
-    }  
-
-    const Apicultor = {
-        Apic_Id: e.Apic_Id,
-        Apic_Foto_Perfil: `${process.env.NEXT_PUBLIC_BASE_URL}/public/upload/profileImage/` + img,
-        Apic_Foto_Capa: `${process.env.NEXT_PUBLIC_BASE_URL}/public/upload/profileCover/` + imgCover,
-        Apic_Biografia: e.Apic_Biografia,
-        Usu_Id: e.Usu_Id
-    };
-
-    return Apicultor;
-}
-
 module.exports = {
     async listarApicultor(request, response) {
         try {

@@ -1,24 +1,6 @@
 const db = require('../database/connection');
 const fs = require('fs-extra');
 
-
-    function geraUrl(e) {
-        const img = e.Agri_Foto_Perfil ? e.Agri_Foto_Perfil : 'farmer.png'; 
-        const imgCover = e.Agri_Foto_Capa ? e.Agri_Foto_Capa : 'default-cover.png';
-    
-        const Agricultor = {
-            Agri: e.Agri_Id,
-            Agri_Foto_Perfil: `${process.env.NEXT_PUBLIC_BASE_URL}/public/upload/profileImage/${img}`,
-            Agri_Foto_Capa: `${process.env.NEXT_PUBLIC_BASE_URL}/upload/profileCover/${imgCover}`,
-            Agri_Biografia: e.Agri_Biografia,
-            Usu_Id: e.Usu_Id
-        };
-    
-        return Agricultor;
-    }
-    
-
-
 module.exports = {
     async listarAgricultor(request, response) {
         try {
@@ -96,38 +78,45 @@ module.exports = {
 
     async editarAgricultor(request, response) {
         try {
-            const { Agri_Biografia } = request.body;
             const { Agri_Id } = request.params;
-    
-            let Agri_Foto_Perfil = request.file ? request.file.filename : null;  // Arquivo de imagem de perfil
-            let Agri_Foto_Capa = request.files ? request.files.coverImage[0].filename : null; // Arquivo de capa
-    
-            if (!Agri_Foto_Perfil && !Agri_Foto_Capa) {
-                return response.status(400).json({
-                    sucesso: false,
-                    mensagem: 'Por favor, envie uma imagem de perfil ou de capa.'
-                });
-            }
-    
-            // Atualiza o Agricultor com as novas informações (se houver)
-            const sql = `UPDATE Agricultor SET Agri_Foto_Perfil = ?, Agri_Foto_Capa = ?, Agri_Biografia = ? WHERE Agri_Id = ?;`;
-            const values = [Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Agri_Id];
-    
-            await db.query(sql, values);
-    
+            const { name, description } = request.body;
+
+            const sqlUpdate = `
+                UPDATE Agricultor 
+                SET Agri_Biografia = ?, 
+                    Agri_Foto_Perfil = ?, 
+                    Agri_Foto_Capa = ?
+                WHERE Agri_Id = ?;
+            `;
+
+            await db.query(sqlUpdate, [
+                description || '',
+                profileImage || '',
+                coverImage || '',
+                Agri_Id,
+            ]);
+
+            const sqlUserUpdate = `
+                UPDATE Usuario
+                SET Usu_NomeCompleto = ?
+                WHERE Usu_Id = (SELECT Usu_Id FROM Agricultor WHERE Agri_Id = ?);
+            `;
+
+            await db.query(sqlUserUpdate, [name, Agri_Id]);
+
             return response.status(200).json({
                 sucesso: true,
-                mensagem: `Agricultor ${Agri_Id} atualizado com sucesso!`
+                mensagem: 'Perfil atualizado com sucesso!',
             });
-    
         } catch (error) {
+            console.error(error);
             return response.status(500).json({
                 sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
+                mensagem: 'Erro ao atualizar o perfil.',
+                dados: error.message,
             });
         }
-    },    
+    },
 
     async apagarAgricultor(request, response) {
         try {

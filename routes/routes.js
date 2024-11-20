@@ -1,8 +1,5 @@
 const express = require('express');
 const router = express.Router(); //armazenando a função Router do módulo express dentro de uma const
-const uploadImageProfile = require('../middleware/uploadProfileImage');
-const uploadImageCover = require('../middleware/uploadProfileCover');
-const uploadChatMidia = require('../middleware/uploadChatMidia');
 const authentication = require('../middleware/authentication')
 
 // referência a controllers que serão utilizados nas rotas
@@ -29,7 +26,7 @@ router.get('/protecao', authentication, (req, res) => {
 const ApicultorController = require('../controllers/apicultor'); 
 
 router.get('/apicultor', ApicultorController.listarApicultor); 
-router.post('/apicultor', uploadImageProfile.single('img'), uploadImageCover.single('imgCover'), ApicultorController.cadastrarApicultor);    
+router.post('/apicultor', ApicultorController.cadastrarApicultor);    
 router.patch('/apicultor/:Apic_Id', ApicultorController.editarApicultor); 
 router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
 
@@ -37,12 +34,8 @@ router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
 const AgricultorController = require('../controllers/agricultor'); 
 
 router.get('/agricultor', AgricultorController.listarAgricultor); 
-router.post('/agricultor', uploadImageProfile.single('img'), uploadImageCover.single('imgCover'), AgricultorController.cadastrarAgricultor);    
-router.patch('/agricultor/:Agri_Id', 
-    uploadImageProfile.single('profileImage'), 
-    uploadImageCover.single('coverImage'),
-    AgricultorController.editarAgricultor
-);
+router.post('/agricultor', AgricultorController.cadastrarAgricultor);
+router.patch('/agricultor/:Agri_Id', AgricultorController.editarAgricultor);
 router.delete('/agricultor/:Usu_Id', AgricultorController.apagarAgricultor);
 
 const ApiariosController = require('../controllers/apiarios'); 
@@ -57,7 +50,7 @@ router.delete('/apiarios/del/:Apia_Id', ApiariosController.ocultarApiarios);
 const ChatController = require('../controllers/chat'); 
 
 router.get('/chat', ChatController.listarChat); 
-router.post('/chat', uploadChatMidia.single('midia'), ChatController.cadastrarChat);
+router.post('/chat', ChatController.cadastrarChat);
 router.patch('/chat/:Chat_Id', ChatController.editarChat); 
 router.delete('/chat/del/:Chat_Id', ChatController.ocultarChat);
 

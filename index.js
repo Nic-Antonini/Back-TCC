@@ -1,15 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
 const router = require('./routes/routes');
-
+const path = require('path');
 const app = express();
-app.use(cors());
+
+app.use(cors({
+    origin: 'http://localhost:3000', // Ou o domínio do front-end
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use(express.json());
 app.use(router)
-app.use('/upload', express.static('public/upload'));
+app.use('/public/upload', express.static(path.join(__dirname, 'public/upload')));
 app.use(bodyParser.json());
+
 
 const PORTA = 3333;
 

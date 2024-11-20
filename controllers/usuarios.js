@@ -220,18 +220,39 @@ async login(request, response) {
             });
         }
 
+        const { Usu_Id, Usu_Tipo, Usu_Email } = user[0][0];
+        let additionalData = {};
+
+        if (Usu_Tipo === 1) {
+            // Apicultor
+            const sqlApicultor = `SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?;`;
+            const apicultorData = await db.query(sqlApicultor, [Usu_Id]);
+            if (apicultorData[0].length > 0) {
+                additionalData = { Apic_Id: apicultorData[0][0].Apic_Id };
+            }
+        } else if (Usu_Tipo === 2) {
+            // Agricultor
+            const sqlAgricultor = `SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?;`;
+            const agricultorData = await db.query(sqlAgricultor, [Usu_Id]);
+            if (agricultorData[0].length > 0) {
+                additionalData = { Agri_Id: agricultorData[0][0].Agri_Id };
+            }
+        }
+
         // Criação do token JWT
         const token = jwt.sign({
-            userId: user[0][0].Usu_Id,
-            userType: user[0][0].Usu_Tipo,
-            email: user[0][0].Usu_Email
-        }, 'secrect_key', { expiresIn: '3h' }); // '3h' -> token expira em s horas
+            userId: Usu_Id,
+            userType: Usu_Tipo,
+            email: Usu_Email,
+            ...additionalData
+        }, 'secrect_key', { expiresIn: '3h' });
 
         return response.status(200).json({
             sucesso: true,
             mensagem: 'Login bem-sucedido.',
             token
         });
+
     } catch (error) {
         return response.status(500).json({
             sucesso: false,
