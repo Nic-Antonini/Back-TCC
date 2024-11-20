@@ -12,7 +12,8 @@ const authentication = require('../middleware/authentication')
 
 const UsuariosController = require('../controllers/usuarios'); 
 
-router.get('/usuarios', UsuariosController.listarUsuarios); 
+router.get('/usuarios', UsuariosController.listarUsuarios);
+router.get('/usuarios/:Usu_Id', UsuariosController.listarUsuarioPorId);
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
 router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
@@ -37,7 +38,11 @@ const AgricultorController = require('../controllers/agricultor');
 
 router.get('/agricultor', AgricultorController.listarAgricultor); 
 router.post('/agricultor', uploadImageProfile.single('img'), uploadImageCover.single('imgCover'), AgricultorController.cadastrarAgricultor);    
-router.patch('/agricultor/:Agri_Id', AgricultorController.editarAgricultor); 
+router.patch('/agricultor/:Agri_Id', 
+    uploadImageProfile.single('profileImage'), 
+    uploadImageCover.single('coverImage'),
+    AgricultorController.editarAgricultor
+);
 router.delete('/agricultor/:Usu_Id', AgricultorController.apagarAgricultor);
 
 const ApiariosController = require('../controllers/apiarios'); 

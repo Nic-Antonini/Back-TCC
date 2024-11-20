@@ -31,8 +31,62 @@ module.exports = {
             });
         }
     }, 
-
-
+        async listarUsuarioPorId(request, response) {
+            try {
+                const { Usu_Id } = request.params;
+    
+                // Verificar se o usuário existe
+                const sqlUser = `SELECT Usu_Id, Usu_NomeCompleto, Usu_Email, Usu_Tipo FROM Usuario WHERE Usu_Id = ? AND Usu_Ativo = 1;`;
+                const user = await db.query(sqlUser, [Usu_Id]);
+    
+                if (user[0].length === 0) {
+                    return response.status(404).json({
+                        sucesso: false,
+                        mensagem: 'Usuário não encontrado ou inativo.'
+                    });
+                }
+    
+                const { Usu_Tipo } = user[0][0];
+    
+                // Verificar dados adicionais (Apicultor ou Agricultor)
+                let additionalData = {};
+                if (Usu_Tipo === 1) {
+                    // Apicultor
+                    const sqlApicultor = `
+                        SELECT Apic_Biografia, Apic_Foto_Perfil, Apic_Foto_Capa
+                        FROM Apicultor
+                        WHERE Usu_Id = ?;
+                    `;
+                    const apicultorData = await db.query(sqlApicultor, [Usu_Id]);
+                    additionalData = apicultorData[0][0];
+                } else if (Usu_Tipo === 2) {
+                    // Agricultor
+                    const sqlAgricultor = `
+                        SELECT Agri_Biografia, Agri_Foto_Perfil, Agri_Foto_Capa
+                        FROM Agricultor
+                        WHERE Usu_Id = ?;
+                    `;
+                    const agricultorData = await db.query(sqlAgricultor, [Usu_Id]);
+                    additionalData = agricultorData[0][0];
+                }
+    
+                // Combinar os dados do usuário com os dados adicionais
+                return response.status(200).json({
+                    sucesso: true,
+                    mensagem: 'Dados do usuário carregados com sucesso.',
+                    dados: {
+                        ...user[0][0],
+                        ...additionalData
+                    }
+                });
+            } catch (error) {
+                return response.status(500).json({
+                    sucesso: false,
+                    mensagem: 'Erro ao carregar os dados do usuário.',
+                    dados: error.message
+                });
+            }
+        },
     
     async cadastrarUsuarios(request, response) {
         try { 
@@ -58,6 +112,22 @@ module.exports = {
             const values = [Usu_NomeCompleto, Usu_Email, hashedPassword, Usu_Tipo]
             const execSql = await db.query(sql,values);
             const Usu_Id = execSql[0].insertId;
+
+            if (Usu_Tipo === 1) {
+                // Apicultor
+                const sqlInsertApicultor = `
+                    INSERT INTO Apicultor (Apic_Foto_Perfil, Apic_Foto_Capa, Apic_Biografia, Usu_Id) 
+                    VALUES (?, ?, ?, ?)`;
+                const valuesApicultor = ['beekeeper.png', 'default-cover.png', 'Fale mais sobre você', Usu_Id];
+                await db.query(sqlInsertApicultor, valuesApicultor);
+            } else if (Usu_Tipo === 2) {
+                // Agricultor
+                const sqlInsertAgricultor = `
+                    INSERT INTO Agricultor (Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id) 
+                    VALUES (?, ?, ?, ?)`;
+                const valuesAgricultor = ['farmer.png', 'default-cover.png', 'Fale mais sobre você', Usu_Id];
+                await db.query(sqlInsertAgricultor, valuesAgricultor);
+            }
 
 
             return response.status(200).json({

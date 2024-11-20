@@ -1,29 +1,23 @@
 const db = require('../database/connection');
 const fs = require('fs-extra');
 
-function geraUrl(e) {
-    // garantir que valores em branco carreguem algo
-    let img = e.Agri_Foto_Perfil ? e.Agri_Foto_Perfil : 'farmer.png';
-    // verifica se imagem existe
-    if (!fs.existsSync('./public/upload/profileImage/' + img)) {
-        img = 'beekeeper.jpg';
+
+    function geraUrl(e) {
+        const img = e.Agri_Foto_Perfil ? e.Agri_Foto_Perfil : 'farmer.png'; 
+        const imgCover = e.Agri_Foto_Capa ? e.Agri_Foto_Capa : 'default-cover.png';
+    
+        const Agricultor = {
+            Agri: e.Agri_Id,
+            Agri_Foto_Perfil: `${process.env.NEXT_PUBLIC_BASE_URL}/public/upload/profileImage/${img}`,
+            Agri_Foto_Capa: `${process.env.NEXT_PUBLIC_BASE_URL}/upload/profileCover/${imgCover}`,
+            Agri_Biografia: e.Agri_Biografia,
+            Usu_Id: e.Usu_Id
+        };
+    
+        return Agricultor;
     }
+    
 
-    let imgCover = e.Agri_Foto_Capa ? e.Agri_Foto_Capa : 'default-cover.png';
-    if (!fs.existsSync('./public/upload/profileCover/' + imgCover)) {
-        imgCover = 'default-cover.png';
-    }  
-
-    const Agriultor = {
-        Agri: e.Agri_Id,
-        Agri_Foto_Perfil: 'http://10.67.23.6:3333/public/upload/profileImage/' + img,
-        Agri_Foto_Capa: 'http://10.67.23.6:3333/public/upload/profileCover/' + imgCover,
-        Agri_Biografia: e.Agri_Biografia,
-        Usu_Id: e.Usu_Id
-    };
-
-    return Agriultor;
-}
 
 module.exports = {
     async listarAgricultor(request, response) {
@@ -39,7 +33,7 @@ module.exports = {
 
             const nItens = Agricultor[0].length;
 
-            const resultado = Apicultor[0].map(geraUrl);
+            const resultado = Agricultor[0].map(geraUrl);
 
             return response.status(200).json({
                 sucesso: true,
@@ -102,20 +96,30 @@ module.exports = {
 
     async editarAgricultor(request, response) {
         try {
-            const { Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id } = request.body;
+            const { Agri_Biografia } = request.body;
             const { Agri_Id } = request.params;
-            const sql = `UPDATE Agricultor SET Agri_Foto_Perfil = ?,  Agri_Foto_Capa = ?, Agri_Biografia = ?, Usu_Id = ?
-                        WHERE Agri_Id = ?;`;
-            const values = [Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id, Agri_Id];
-            const atualizaDados = await db.query(sql, values);
-
-
+    
+            let Agri_Foto_Perfil = request.file ? request.file.filename : null;  // Arquivo de imagem de perfil
+            let Agri_Foto_Capa = request.files ? request.files.coverImage[0].filename : null; // Arquivo de capa
+    
+            if (!Agri_Foto_Perfil && !Agri_Foto_Capa) {
+                return response.status(400).json({
+                    sucesso: false,
+                    mensagem: 'Por favor, envie uma imagem de perfil ou de capa.'
+                });
+            }
+    
+            // Atualiza o Agricultor com as novas informações (se houver)
+            const sql = `UPDATE Agricultor SET Agri_Foto_Perfil = ?, Agri_Foto_Capa = ?, Agri_Biografia = ? WHERE Agri_Id = ?;`;
+            const values = [Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Agri_Id];
+    
+            await db.query(sql, values);
+    
             return response.status(200).json({
                 sucesso: true,
-                mensagem: `Agricultor ${Agri_Id} atualizado com sucesso!`,
-                dados: atualizaDados[0].affectedRows
+                mensagem: `Agricultor ${Agri_Id} atualizado com sucesso!`
             });
-
+    
         } catch (error) {
             return response.status(500).json({
                 sucesso: false,
@@ -123,9 +127,7 @@ module.exports = {
                 dados: error.message
             });
         }
-    },
-
-
+    },    
 
     async apagarAgricultor(request, response) {
         try {
