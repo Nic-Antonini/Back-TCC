@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router(); //armazenando a função Router do módulo express dentro de uma const
-const authentication = require('../middleware/authentication')
+const authentication = require('../middleware/authentication');
+const upload = require('../middleware/upload');
 
 // referência a controllers que serão utilizados nas rotas
 // post
 // patch
 // delete
-
 const UsuariosController = require('../controllers/usuarios'); 
 
 router.get('/usuarios', UsuariosController.listarUsuarios);
