@@ -10,7 +10,7 @@ const upload = require('../middleware/upload');
 const UsuariosController = require('../controllers/usuarios'); 
 
 router.get('/usuarios', UsuariosController.listarUsuarios);
-router.get('/usuarios/:Usu_Id', UsuariosController.listarUsuarioPorId);
+router.get('/usuarios/:Usu_Id', UsuariosController.listarDadosUsuario);
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
 router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
@@ -63,17 +63,12 @@ router.post('/especie_apiario', EspecieApiarioController.cadastrarEspecieApiario
 router.patch('/especie_apiario/:Espe_Apia_Id', EspecieApiarioController.editarEspecieApiario); 
 router.delete('/especie_apiario/del/:Espe_Apia_Id', EspecieApiarioController.ocultarEspecieApiario);
 
-
-
 const ConexaoController = require('../controllers/conexao'); 
 
 router.get('/conexao', ConexaoController.listarConexao); 
 router.post('/conexao', ConexaoController.cadastrarConexao); 
 router.patch('/conexao/:Con_Id', ConexaoController.editarConexao); 
 router.delete('/conexao/:Con_Id', ConexaoController.apagarConexao); 
-
-
-
 
 const CultivoController = require('../controllers/cultivo'); 
 
