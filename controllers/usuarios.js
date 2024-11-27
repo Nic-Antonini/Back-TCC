@@ -91,102 +91,76 @@ module.exports = {
         async cadastrarUsuarios(request, response) {
             try {
                 const { Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo } = request.body;
-    
+        
                 // Verificar se o email já existe
                 const sqlCheckEmail = `SELECT * FROM Usuario WHERE Usu_Email = ?`;
                 const existingUser = await db.query(sqlCheckEmail, [Usu_Email]);
-    
+        
                 if (existingUser[0].length > 0) {
                     return response.status(400).json({
                         sucesso: false,
-                        mensagem: 'Este e-mail já está cadastrado.'
+                        mensagem: 'Este e-mail já está cadastrado.',
                     });
                 }
-    
+        
                 // Criptografar a senha
                 const hashedPassword = await bcrypt.hash(Usu_Senha, 10);
-                
+        
                 // Inserir o usuário na tabela Usuario
                 const sql = `INSERT INTO Usuario (Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo) VALUES (?,?,?,?)`;
                 const values = [Usu_NomeCompleto, Usu_Email, hashedPassword, Usu_Tipo];
                 const execSql = await db.query(sql, values);
                 const Usu_Id = execSql[0].insertId;
-    
-                // Inserir dados padrões para Apicultor ou Agricultor
-                if (Usu_Tipo === 1) {
-                    // Apicultor
+        
+                if (Usu_Tipo === 1) { // Apicultor
+                    // Inserir apicultor
                     const sqlInsertApicultor = `
                         INSERT INTO Apicultor (Apic_Foto_Perfil, Apic_Foto_Capa, Apic_Biografia, Usu_Id) 
                         VALUES (?, ?, ?, ?)`;
                     const valuesApicultor = ['beekeeper.png', 'default-cover.png', 'Fale mais sobre você', Usu_Id];
                     const apicultorResult = await db.query(sqlInsertApicultor, valuesApicultor);
-                    const Apic_Id = apicultorResult[0].insertId;
-    
-                    // Criar um Apiário padrão
+        
+                    // Criar um apiário padrão sem espécies associadas
                     const sqlInsertApiario = `
                         INSERT INTO Apiarios (Apia_Nome, Apia_Cidade, Apia_Estado, Apia_Lat, Apia_Lng, Apia_Caixas, Apia_Ativo, Apic_Id)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-                    const valuesApiario = ['Nome do Apiário', 'Cidade', 'Estado', -15.7942, -47.8822, 0, true, Apic_Id];
-                    const apiarioResult = await db.query(sqlInsertApiario, valuesApiario);
-                    const Apia_Id = apiarioResult[0].insertId;
-    
-                    // Inserir uma espécie padrão (pode ser fictícia)
-                    const sqlInsertEspecie = `SELECT Espe_Id FROM Especie LIMIT 1;`;  // Pegando uma espécie qualquer
-                    const especieResult = await db.query(sqlInsertEspecie);
-                    const espeId = especieResult[0][0]?.Espe_Id;
-    
-                    if (espeId) {
-                        const sqlInsertEspecieApiario = `
-                            INSERT INTO Especie_Apiario (Apia_Id, Espe_Id, Espe_Apia_Ativo) 
-                            VALUES (?, ?, ?);`;
-                        await db.query(sqlInsertEspecieApiario, [Apia_Id, espeId, 1]);  // 1 significa ativo
-                    }
-    
-                } else if (Usu_Tipo === 2) {
-                    // Agricultor
+                    const Apic_Id = apicultorResult[0].insertId;
+                    await db.query(sqlInsertApiario, ['Nome do seu apiário', 'Cidade', 'Estado', -15.7942, -47.8822, 0, true, Apic_Id]);
+        
+                    // Sem espécies padrão associadas ao apiário
+                } else if (Usu_Tipo === 2) { // Agricultor
+                    // Inserir agricultor
                     const sqlInsertAgricultor = `
                         INSERT INTO Agricultor (Agri_Foto_Perfil, Agri_Foto_Capa, Agri_Biografia, Usu_Id) 
                         VALUES (?, ?, ?, ?)`;
                     const valuesAgricultor = ['farmer.png', 'default-cover.png', 'Fale mais sobre você', Usu_Id];
                     const agricultorResult = await db.query(sqlInsertAgricultor, valuesAgricultor);
-                    const Agri_Id = agricultorResult[0].insertId;
-    
-                    // Criar uma Propriedade padrão
+        
+                    // Criar uma propriedade padrão sem cultivos associados
                     const sqlInsertPropriedade = `
                         INSERT INTO Propriedade (Prop_Nome, Prop_Cidade, Prop_Estado, Prop_Lat, Prop_Lng, Prop_Hectare, Prop_Ativo, Agri_Id)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-                    const valuesPropriedade = ['Nome da Propriedade', 'Cidade', 'Estado', -15.7942, -47.8822, 0, true, Agri_Id];
-                    const propriedadeResult = await db.query(sqlInsertPropriedade, valuesPropriedade);
-                    const Prop_Id = propriedadeResult[0].insertId;
-    
-                    // Inserir um cultivo padrão
-                    const sqlInsertCultivo = `SELECT Cult_Id FROM Cultivo LIMIT 1;`;  // Pegando um cultivo qualquer
-                    const cultivoResult = await db.query(sqlInsertCultivo);
-                    const cultId = cultivoResult[0][0]?.Cult_Id;
-    
-                    if (cultId) {
-                        const sqlInsertCultivoPropriedade = `
-                            INSERT INTO Cultivo_Propriedade (Cult_Id, Prop_Id, Cult_Prop_Ativo) 
-                            VALUES (?, ?, ?);`;
-                        await db.query(sqlInsertCultivoPropriedade, [cultId, Prop_Id, 1]);  // 1 significa ativo
-                    }
+                    const Agri_Id = agricultorResult[0].insertId;
+                    await db.query(sqlInsertPropriedade, ['Nome da sua propriedade', 'Cidade', 'Estado', -15.7942, -47.8822, 0.0, true, Agri_Id]);
+        
+                    // Sem cultivos padrão associados à propriedade
                 }
-    
+        
                 return response.status(200).json({
                     sucesso: true,
                     mensagem: 'Cadastro de usuário realizado com sucesso.',
-                    dados: Usu_Id
+                    dados: Usu_Id,
                 });
-    
             } catch (error) {
                 return response.status(500).json({
                     sucesso: false,
                     mensagem: 'Erro na requisição.',
-                    dados: error.message
+                    dados: error.message,
                 });
             }
         },
-    
+        
+        
 
     async editarUsuarios(request, response) {
         try {    
@@ -305,108 +279,111 @@ async login(request, response) {
     }
 },
 async listarDadosUsuario(request, response) {
-    const { Usu_Id } = request.params;  // Obtendo o Usu_Id da URL
-
     try {
-        // Buscar o usuário na tabela Usuario
-        const sqlUsuario = `SELECT * FROM Usuario WHERE Usu_Id = ?`;
-        const usuario = await db.query(sqlUsuario, [Usu_Id]);
+        const { Usu_Id } = request.params;
 
-        if (usuario[0].length === 0) {
+        // Buscar dados do usuário
+        const sqlUser = `SELECT Usu_Id, Usu_NomeCompleto, Usu_Email, Usu_Tipo FROM Usuario WHERE Usu_Id = ? AND Usu_Ativo = 1;`;
+        const user = await db.query(sqlUser, [Usu_Id]);
+
+        if (user[0].length === 0) {
             return response.status(404).json({
                 sucesso: false,
-                mensagem: 'Usuário não encontrado.'
+                mensagem: 'Usuário não encontrado ou inativo.',
             });
         }
 
-        const { Usu_Tipo } = usuario[0][0];
+        const { Usu_Tipo } = user[0][0];
 
-        if (Usu_Tipo === 1) {
-            // Apicultor
-            // Buscar dados da tabela Apicultor
+        let additionalData = {};
+        let cultivosSelecionados = [];
+        let especiesSelecionadas = [];
+        let nameFarm = '';
+        let hectares = 0;
+        let nameApiary = '';
+        let availability = 0;
+        let lat = null;
+        let lng = null;
+
+        if (Usu_Tipo === 1) { // Apicultor
             const sqlApicultor = `
-                SELECT * FROM Apicultor WHERE Usu_Id = ?`;
-            const apicultor = await db.query(sqlApicultor, [Usu_Id]);
+                SELECT Apic_Biografia, Apic_Foto_Perfil, Apic_Foto_Capa 
+                FROM Apicultor WHERE Usu_Id = ?;`;
+            const apicultorData = await db.query(sqlApicultor, [Usu_Id]);
+            additionalData = apicultorData[0][0];
 
-            if (apicultor[0].length === 0) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Dados do Apicultor não encontrados.'
-                });
+            const sqlApiario = `
+                SELECT Apia_Id, Apia_Nome, Apia_Caixas, Apia_Lat, Apia_Lng 
+                FROM Apiarios WHERE Apic_Id = (
+                    SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?
+                );`;
+            const apiarioData = await db.query(sqlApiario, [Usu_Id]);
+
+            if (apiarioData[0].length > 0) {
+                const apiario = apiarioData[0][0];
+                nameApiary = apiario.Apia_Nome || '';
+                availability = apiario.Apia_Caixas || 0;
+                lat = apiario.Apia_Lat || null;
+                lng = apiario.Apia_Lng || null;
+
+                const sqlEspecies = `
+                    SELECT Espe_Id FROM Especie_Apiario 
+                    WHERE Apia_Id = ? AND Espe_Apia_Ativo = 1;`;
+                const especies = await db.query(sqlEspecies, [apiario.Apia_Id]);
+                especiesSelecionadas = especies[0].map((e) => e.Espe_Id);
             }
-
-            // Buscar dados de Apiários do Apicultor
-            const sqlApiarios = `
-                SELECT * FROM Apiarios WHERE Apic_Id = ?`;
-            const apiarios = await db.query(sqlApiarios, [apicultor[0][0].Apic_Id]);
-
-            // Buscar espécies associadas aos Apiários
-            const sqlEspeciesApiario = `
-                SELECT Especie.* FROM Especie
-                INNER JOIN Especie_Apiario ON Especie_Apiario.Espe_Id = Especie.Espe_Id
-                WHERE Especie_Apiario.Apia_Id IN (SELECT Apia_Id FROM Apiarios WHERE Apic_Id = ?)`;
-            const especiesApiario = await db.query(sqlEspeciesApiario, [apicultor[0][0].Apic_Id]);
-
-            return response.status(200).json({
-                sucesso: true,
-                dados: {
-                    usuario: usuario[0][0],
-                    apicultor: apicultor[0][0],
-                    apiarios: apiarios[0],
-                    especiesApiario: especiesApiario[0],
-                }
-            });
-
-        } else if (Usu_Tipo === 2) {
-            // Agricultor
-            // Buscar dados da tabela Agricultor
+        } else if (Usu_Tipo === 2) { // Agricultor
             const sqlAgricultor = `
-                SELECT * FROM Agricultor WHERE Usu_Id = ?`;
-            const agricultor = await db.query(sqlAgricultor, [Usu_Id]);
+                SELECT Agri_Biografia, Agri_Foto_Perfil, Agri_Foto_Capa 
+                FROM Agricultor WHERE Usu_Id = ?;`;
+            const agricultorData = await db.query(sqlAgricultor, [Usu_Id]);
+            additionalData = agricultorData[0][0];
 
-            if (agricultor[0].length === 0) {
-                return response.status(404).json({
-                    sucesso: false,
-                    mensagem: 'Dados do Agricultor não encontrados.'
-                });
+            const sqlPropriedade = `
+                SELECT Prop_Id, Prop_Nome, Prop_Hectare, Prop_Lat, Prop_Lng 
+                FROM Propriedade WHERE Agri_Id = (
+                    SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?
+                );`;
+            const propriedadeData = await db.query(sqlPropriedade, [Usu_Id]);
+
+            if (propriedadeData[0].length > 0) {
+                const propriedade = propriedadeData[0][0];
+                nameFarm = propriedade.Prop_Nome || '';
+                hectares = propriedade.Prop_Hectare || 0;
+                lat = propriedade.Prop_Lat || null;
+                lng = propriedade.Prop_Lng || null;
+
+                const sqlCultivos = `
+                    SELECT Cult_Id FROM Cultivo_Propriedade 
+                    WHERE Prop_Id = ? AND Cult_Prop_Ativo = 1;`;
+                const cultivos = await db.query(sqlCultivos, [propriedade.Prop_Id]);
+                cultivosSelecionados = cultivos[0].map((c) => c.Cult_Id);
             }
-
-            // Buscar dados de Propriedades do Agricultor
-            const sqlPropriedades = `
-                SELECT * FROM Propriedade WHERE Agri_Id = ?`;
-            const propriedades = await db.query(sqlPropriedades, [agricultor[0][0].Agri_Id]);
-
-            // Buscar cultivos associados às Propriedades
-            const sqlCultivosPropriedade = `
-                SELECT Cultivo.* FROM Cultivo
-                INNER JOIN Cultivo_Propriedade ON Cultivo_Propriedade.Cult_Id = Cultivo.Cult_Id
-                WHERE Cultivo_Propriedade.Prop_Id IN (SELECT Prop_Id FROM Propriedade WHERE Agri_Id = ?)`;
-            const cultivosPropriedade = await db.query(sqlCultivosPropriedade, [agricultor[0][0].Agri_Id]);
-
-            return response.status(200).json({
-                sucesso: true,
-                dados: {
-                    usuario: usuario[0][0],
-                    agricultor: agricultor[0][0],
-                    propriedades: propriedades[0],
-                    cultivosPropriedade: cultivosPropriedade[0],
-                }
-            });
-
-        } else {
-            return response.status(400).json({
-                sucesso: false,
-                mensagem: 'Tipo de usuário inválido.'
-            });
         }
 
+        return response.status(200).json({
+            sucesso: true,
+            mensagem: 'Dados do usuário carregados com sucesso.',
+            dados: {
+                ...user[0][0],
+                ...additionalData,
+                cultivosSelecionados,
+                especiesSelecionadas,
+                nameFarm,
+                hectares,
+                nameApiary,
+                availability,
+                lat,
+                lng,
+            },
+        });
     } catch (error) {
         return response.status(500).json({
             sucesso: false,
-            mensagem: 'Erro na requisição.',
-            dados: error.message
+            mensagem: 'Erro ao carregar os dados do usuário.',
+            dados: error.message,
         });
     }
-},
+}
 
 }
