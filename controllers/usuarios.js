@@ -384,6 +384,128 @@ async listarDadosUsuario(request, response) {
             dados: error.message,
         });
     }
+},
+async atualizarDadosUsuario(request, response) {
+    try {
+        const { Usu_Id } = request.params;
+        const {
+            name,
+            description,
+            profileImage,
+            profileCover,
+            userType,
+            nameApiary,
+            nameFarm,
+            hectares,
+            availability,
+            lat,
+            lng,
+            city,
+            state,
+            cultivosSelecionados = [],
+            especiesSelecionadas = [],
+        } = request.body;
+
+        console.log("Iniciando atualização para Usu_Id:", Usu_Id);
+
+        // Atualizar informações gerais do usuário
+        const sqlUpdateUsuario = `UPDATE Usuario SET Usu_NomeCompleto = ? WHERE Usu_Id = ?;`;
+        await db.query(sqlUpdateUsuario, [name, Usu_Id]);
+        console.log("Atualizado nome do usuário:", name);
+
+        if (userType === 1) {
+            // Apicultor e Apiário
+            const sqlUpdateApicultor = `
+                UPDATE Apicultor 
+                SET Apic_Biografia = ?, Apic_Foto_Perfil = ?, Apic_Foto_Capa = ?
+                WHERE Usu_Id = ?;`;
+            await db.query(sqlUpdateApicultor, [description, profileImage, profileCover, Usu_Id]);
+            console.log("Atualizado Apicultor para Usu_Id:", Usu_Id);
+
+            const apiaIdResult = await db.query(
+                `SELECT Apia_Id FROM Apiarios WHERE Apic_Id = (SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?);`,
+                [Usu_Id]
+            );
+
+            if (apiaIdResult[0].length === 0) {
+                throw new Error(`Apiário não encontrado para Usu_Id ${Usu_Id}`);
+            }
+
+            const apiaId = apiaIdResult[0][0].Apia_Id;
+            const sqlUpdateApiario = `
+                UPDATE Apiarios
+                SET Apia_Nome = ?, Apia_Caixas = ?, Apia_Lat = ?, Apia_Lng = ?, Apia_Cidade = ?, Apia_Estado = ?
+                WHERE Apia_Id = ?;`;
+            await db.query(sqlUpdateApiario, [nameApiary, availability, lat, lng, city, state, apiaId]);
+            console.log("Atualizado Apiário:", apiaId);
+
+            const sqlDeleteEspecies = `DELETE FROM Especie_Apiario WHERE Apia_Id = ?;`;
+            await db.query(sqlDeleteEspecies, [apiaId]);
+            console.log("Especies antigas removidas para Apiário:", apiaId);
+
+            if (especiesSelecionadas.length > 0) {
+                const sqlInsertEspecies = `
+                    INSERT INTO Especie_Apiario (Apia_Id, Espe_Id, Espe_Apia_Ativo)
+                    VALUES (?, ?, 1);`;
+                for (const especieId of especiesSelecionadas) {
+                    await db.query(sqlInsertEspecies, [apiaId, especieId]);
+                }
+                console.log("Especies atualizadas:", especiesSelecionadas);
+            }
+        } else if (userType === 2) {
+            // Agricultor e Propriedade
+            const sqlUpdateAgricultor = `
+                UPDATE Agricultor 
+                SET Agri_Biografia = ?, Agri_Foto_Perfil = ?, Agri_Foto_Capa = ?
+                WHERE Usu_Id = ?;`;
+            await db.query(sqlUpdateAgricultor, [description, profileImage, profileCover, Usu_Id]);
+            console.log("Atualizado Agricultor para Usu_Id:", Usu_Id);
+
+            const propIdResult = await db.query(
+                `SELECT Prop_Id FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?);`,
+                [Usu_Id]
+            );
+
+            if (propIdResult[0].length === 0) {
+                throw new Error(`Propriedade não encontrada para Usu_Id ${Usu_Id}`);
+            }
+
+            const propId = propIdResult[0][0].Prop_Id;
+            const sqlUpdatePropriedade = `
+                UPDATE Propriedade
+                SET Prop_Nome = ?, Prop_Hectare = ?, Prop_Lat = ?, Prop_Lng = ?, Prop_Cidade = ?, Prop_Estado = ?
+                WHERE Prop_Id = ?;`;
+            await db.query(sqlUpdatePropriedade, [nameFarm, hectares, lat, lng, city, state, propId]);
+            console.log("Atualizada Propriedade:", propId);
+
+            const sqlDeleteCultivos = `DELETE FROM Cultivo_Propriedade WHERE Prop_Id = ?;`;
+            await db.query(sqlDeleteCultivos, [propId]);
+            console.log("Cultivos antigos removidos para Propriedade:", propId);
+
+            if (cultivosSelecionados.length > 0) {
+                const sqlInsertCultivos = `
+                    INSERT INTO Cultivo_Propriedade (Prop_Id, Cult_Id, Cult_Prop_Ativo)
+                    VALUES (?, ?, 1);`;
+                for (const cultivoId of cultivosSelecionados) {
+                    await db.query(sqlInsertCultivos, [propId, cultivoId]);
+                }
+                console.log("Cultivos atualizados:", cultivosSelecionados);
+            }
+        }
+
+        return response.status(200).json({
+            sucesso: true,
+            mensagem: 'Dados do usuário atualizados com sucesso.',
+        });
+    } catch (error) {
+        console.error("Erro ao atualizar dados do usuário:", error.message);
+        return response.status(500).json({
+            sucesso: false,
+            mensagem: 'Erro ao atualizar os dados do usuário.',
+            dados: error.message,
+        });
+    }
 }
+
 
 }

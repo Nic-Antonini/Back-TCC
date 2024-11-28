@@ -12,7 +12,7 @@ const UsuariosController = require('../controllers/usuarios');
 router.get('/usuarios', UsuariosController.listarUsuarios);
 router.get('/usuarios/:Usu_Id', UsuariosController.listarDadosUsuario);
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
-router.patch('/usuarios/:Usu_Id', UsuariosController.editarUsuarios); 
+router.patch('/usuarios/:Usu_Id', UsuariosController.atualizarDadosUsuario); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
 router.post('/usuarios/login', UsuariosController.login);
 router.get('/protecao', authentication, (req, res) => {
