@@ -1,3 +1,6 @@
+
+//controller usuarios que lista e atualiza os dados na tela de editar perfil no front
+
 const db = require('../database/connection'); 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -315,8 +318,7 @@ async listarDadosUsuario(request, response) {
             const sqlApiario = `
                 SELECT Apia_Id, Apia_Nome, Apia_Caixas, Apia_Lat, Apia_Lng 
                 FROM Apiarios WHERE Apic_Id = (
-                    SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?
-                );`;
+                    SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?);`;
             const apiarioData = await db.query(sqlApiario, [Usu_Id]);
 
             if (apiarioData[0].length > 0) {
@@ -342,8 +344,7 @@ async listarDadosUsuario(request, response) {
             const sqlPropriedade = `
                 SELECT Prop_Id, Prop_Nome, Prop_Hectare, Prop_Lat, Prop_Lng 
                 FROM Propriedade WHERE Agri_Id = (
-                    SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?
-                );`;
+                    SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?);`;
             const propriedadeData = await db.query(sqlPropriedade, [Usu_Id]);
 
             if (propriedadeData[0].length > 0) {
@@ -385,6 +386,7 @@ async listarDadosUsuario(request, response) {
         });
     }
 },
+
 async atualizarDadosUsuario(request, response) {
     try {
         const { Usu_Id } = request.params;
@@ -459,28 +461,25 @@ async atualizarDadosUsuario(request, response) {
                 SET Agri_Biografia = ?, Agri_Foto_Perfil = ?, Agri_Foto_Capa = ?
                 WHERE Usu_Id = ?;`;
             await db.query(sqlUpdateAgricultor, [description, profileImage, profileCover, Usu_Id]);
-            console.log("Atualizado Agricultor para Usu_Id:", Usu_Id);
 
-            const propIdResult = await db.query(
+            const propriedadeIdResult = await db.query(
                 `SELECT Prop_Id FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?);`,
                 [Usu_Id]
             );
 
-            if (propIdResult[0].length === 0) {
+            if (propriedadeIdResult[0].length === 0) {
                 throw new Error(`Propriedade não encontrada para Usu_Id ${Usu_Id}`);
             }
 
-            const propId = propIdResult[0][0].Prop_Id;
+            const propId = propriedadeIdResult[0][0].Prop_Id;
             const sqlUpdatePropriedade = `
                 UPDATE Propriedade
                 SET Prop_Nome = ?, Prop_Hectare = ?, Prop_Lat = ?, Prop_Lng = ?, Prop_Cidade = ?, Prop_Estado = ?
                 WHERE Prop_Id = ?;`;
             await db.query(sqlUpdatePropriedade, [nameFarm, hectares, lat, lng, city, state, propId]);
-            console.log("Atualizada Propriedade:", propId);
 
             const sqlDeleteCultivos = `DELETE FROM Cultivo_Propriedade WHERE Prop_Id = ?;`;
             await db.query(sqlDeleteCultivos, [propId]);
-            console.log("Cultivos antigos removidos para Propriedade:", propId);
 
             if (cultivosSelecionados.length > 0) {
                 const sqlInsertCultivos = `
@@ -489,7 +488,6 @@ async atualizarDadosUsuario(request, response) {
                 for (const cultivoId of cultivosSelecionados) {
                     await db.query(sqlInsertCultivos, [propId, cultivoId]);
                 }
-                console.log("Cultivos atualizados:", cultivosSelecionados);
             }
         }
 
@@ -498,14 +496,13 @@ async atualizarDadosUsuario(request, response) {
             mensagem: 'Dados do usuário atualizados com sucesso.',
         });
     } catch (error) {
-        console.error("Erro ao atualizar dados do usuário:", error.message);
         return response.status(500).json({
             sucesso: false,
             mensagem: 'Erro ao atualizar os dados do usuário.',
             dados: error.message,
         });
     }
-}
+},
 
 
 }
