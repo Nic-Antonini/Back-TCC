@@ -1,17 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const authentication = require('../middleware/authentication');
-const upload = require('../middleware/upload');
 
-router.post('/upload', upload.single('image'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'Nenhum arquivo enviado ou tipo não suportado.' });
-    }
-    const imagePath = `/upload/${req.file.filename}`;
-    res.json({ message: 'Upload realizado com sucesso!', imagePath });
-});
-
-// referência a controllers que serão utilizados nas rotas
+// Referência a controllers que serão utilizados nas rotas
 const UsuariosController = require('../controllers/usuarios'); 
 
 router.get('/usuarios', UsuariosController.listarUsuarios);
@@ -20,13 +11,12 @@ router.post('/usuarios', UsuariosController.cadastrarUsuarios);
 router.patch('/usuarios/:Usu_Id', UsuariosController.atualizarDadosUsuario); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
 router.post('/usuarios/login', UsuariosController.login);
-
 router.get('/protecao', authentication, (req, res) => {
     return res.status(200).json({
         sucesso: true,
         mensagem: 'Você tem acesso à rota protegida.'
     });
-}); 
+});
 
 
 const ApicultorController = require('../controllers/apicultor'); 
@@ -107,8 +97,6 @@ router.get('/propriedade', PropriedadeController.listarPropriedade);
 router.post('/propriedade', PropriedadeController.cadastrarPropriedade); 
 router.patch('/propriedade/:Prop_Id', PropriedadeController.editarPropriedade); 
 router.delete('/propriedade/del/:Prop_Id', PropriedadeController.ocultarPropriedade);
-
-
 
 
 module.exports = router;
