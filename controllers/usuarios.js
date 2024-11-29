@@ -394,6 +394,7 @@ async atualizarDadosUsuario(request, response) {
             cultivosSelecionados = [],
             especiesSelecionadas = [],
         } = request.body;
+        
         console.log("Iniciando atualização para Usu_Id:", Usu_Id);
         // Atualizar informações gerais do usuário
         const sqlUpdateUsuario = `UPDATE Usuario SET Usu_NomeCompleto = ? WHERE Usu_Id = ?;`;
