@@ -284,20 +284,16 @@ async login(request, response) {
 async listarDadosUsuario(request, response) {
     try {
         const { Usu_Id } = request.params;
-
         // Buscar dados do usuário
         const sqlUser = `SELECT Usu_Id, Usu_NomeCompleto, Usu_Email, Usu_Tipo FROM Usuario WHERE Usu_Id = ? AND Usu_Ativo = 1;`;
         const user = await db.query(sqlUser, [Usu_Id]);
-
         if (user[0].length === 0) {
             return response.status(404).json({
                 sucesso: false,
                 mensagem: 'Usuário não encontrado ou inativo.',
             });
         }
-
         const { Usu_Tipo } = user[0][0];
-
         let additionalData = {};
         let cultivosSelecionados = [];
         let especiesSelecionadas = [];
@@ -307,61 +303,53 @@ async listarDadosUsuario(request, response) {
         let availability = 0;
         let lat = null;
         let lng = null;
-
         if (Usu_Tipo === 1) { // Apicultor
-            const sqlApicultor = `
-                SELECT Apic_Biografia, Apic_Foto_Perfil, Apic_Foto_Capa 
+            const sqlApicultor = 
+                `SELECT Apic_Biografia, Apic_Foto_Perfil, Apic_Foto_Capa 
                 FROM Apicultor WHERE Usu_Id = ?;`;
             const apicultorData = await db.query(sqlApicultor, [Usu_Id]);
             additionalData = apicultorData[0][0];
-
-            const sqlApiario = `
-                SELECT Apia_Id, Apia_Nome, Apia_Caixas, Apia_Lat, Apia_Lng 
+            const sqlApiario = 
+                `SELECT Apia_Id, Apia_Nome, Apia_Caixas, Apia_Lat, Apia_Lng 
                 FROM Apiarios WHERE Apic_Id = (
                     SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?);`;
             const apiarioData = await db.query(sqlApiario, [Usu_Id]);
-
             if (apiarioData[0].length > 0) {
                 const apiario = apiarioData[0][0];
                 nameApiary = apiario.Apia_Nome || '';
                 availability = apiario.Apia_Caixas || 0;
                 lat = apiario.Apia_Lat || null;
                 lng = apiario.Apia_Lng || null;
-
-                const sqlEspecies = `
-                    SELECT Espe_Id FROM Especie_Apiario 
+                const sqlEspecies = 
+                    `SELECT Espe_Id FROM Especie_Apiario 
                     WHERE Apia_Id = ? AND Espe_Apia_Ativo = 1;`;
                 const especies = await db.query(sqlEspecies, [apiario.Apia_Id]);
                 especiesSelecionadas = especies[0].map((e) => e.Espe_Id);
             }
         } else if (Usu_Tipo === 2) { // Agricultor
-            const sqlAgricultor = `
-                SELECT Agri_Biografia, Agri_Foto_Perfil, Agri_Foto_Capa 
+            const sqlAgricultor = 
+                `SELECT Agri_Biografia, Agri_Foto_Perfil, Agri_Foto_Capa 
                 FROM Agricultor WHERE Usu_Id = ?;`;
             const agricultorData = await db.query(sqlAgricultor, [Usu_Id]);
             additionalData = agricultorData[0][0];
-
-            const sqlPropriedade = `
-                SELECT Prop_Id, Prop_Nome, Prop_Hectare, Prop_Lat, Prop_Lng 
+            const sqlPropriedade = 
+                `SELECT Prop_Id, Prop_Nome, Prop_Hectare, Prop_Lat, Prop_Lng 
                 FROM Propriedade WHERE Agri_Id = (
                     SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?);`;
             const propriedadeData = await db.query(sqlPropriedade, [Usu_Id]);
-
             if (propriedadeData[0].length > 0) {
                 const propriedade = propriedadeData[0][0];
                 nameFarm = propriedade.Prop_Nome || '';
                 hectares = propriedade.Prop_Hectare || 0;
                 lat = propriedade.Prop_Lat || null;
                 lng = propriedade.Prop_Lng || null;
-
-                const sqlCultivos = `
-                    SELECT Cult_Id FROM Cultivo_Propriedade 
+                const sqlCultivos = 
+                    `SELECT Cult_Id FROM Cultivo_Propriedade 
                     WHERE Prop_Id = ? AND Cult_Prop_Ativo = 1;`;
                 const cultivos = await db.query(sqlCultivos, [propriedade.Prop_Id]);
                 cultivosSelecionados = cultivos[0].map((c) => c.Cult_Id);
             }
         }
-
         return response.status(200).json({
             sucesso: true,
             mensagem: 'Dados do usuário carregados com sucesso.',
@@ -386,7 +374,6 @@ async listarDadosUsuario(request, response) {
         });
     }
 },
-
 async atualizarDadosUsuario(request, response) {
     try {
         const { Usu_Id } = request.params;
@@ -407,47 +394,39 @@ async atualizarDadosUsuario(request, response) {
             cultivosSelecionados = [],
             especiesSelecionadas = [],
         } = request.body;
-
         console.log("Iniciando atualização para Usu_Id:", Usu_Id);
-
         // Atualizar informações gerais do usuário
         const sqlUpdateUsuario = `UPDATE Usuario SET Usu_NomeCompleto = ? WHERE Usu_Id = ?;`;
         await db.query(sqlUpdateUsuario, [name, Usu_Id]);
         console.log("Atualizado nome do usuário:", name);
-
         if (userType === 1) {
             // Apicultor e Apiário
-            const sqlUpdateApicultor = `
-                UPDATE Apicultor 
+            const sqlUpdateApicultor = 
+                `UPDATE Apicultor 
                 SET Apic_Biografia = ?, Apic_Foto_Perfil = ?, Apic_Foto_Capa = ?
                 WHERE Usu_Id = ?;`;
             await db.query(sqlUpdateApicultor, [description, profileImage, profileCover, Usu_Id]);
             console.log("Atualizado Apicultor para Usu_Id:", Usu_Id);
-
             const apiaIdResult = await db.query(
                 `SELECT Apia_Id FROM Apiarios WHERE Apic_Id = (SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?);`,
                 [Usu_Id]
             );
-
             if (apiaIdResult[0].length === 0) {
                 throw new Error(`Apiário não encontrado para Usu_Id ${Usu_Id}`);
             }
-
             const apiaId = apiaIdResult[0][0].Apia_Id;
-            const sqlUpdateApiario = `
-                UPDATE Apiarios
+            const sqlUpdateApiario = 
+                `UPDATE Apiarios
                 SET Apia_Nome = ?, Apia_Caixas = ?, Apia_Lat = ?, Apia_Lng = ?, Apia_Cidade = ?, Apia_Estado = ?
                 WHERE Apia_Id = ?;`;
             await db.query(sqlUpdateApiario, [nameApiary, availability, lat, lng, city, state, apiaId]);
             console.log("Atualizado Apiário:", apiaId);
-
-            const sqlDeleteEspecies = `DELETE FROM Especie_Apiario WHERE Apia_Id = ?;`;
+            const sqlDeleteEspecies = 'DELETE FROM Especie_Apiario WHERE Apia_Id = ?;';
             await db.query(sqlDeleteEspecies, [apiaId]);
             console.log("Especies antigas removidas para Apiário:", apiaId);
-
             if (especiesSelecionadas.length > 0) {
-                const sqlInsertEspecies = `
-                    INSERT INTO Especie_Apiario (Apia_Id, Espe_Id, Espe_Apia_Ativo)
+                const sqlInsertEspecies = 
+                    `INSERT INTO Especie_Apiario (Apia_Id, Espe_Id, Espe_Apia_Ativo)
                     VALUES (?, ?, 1);`;
                 for (const especieId of especiesSelecionadas) {
                     await db.query(sqlInsertEspecies, [apiaId, especieId]);
@@ -456,8 +435,8 @@ async atualizarDadosUsuario(request, response) {
             }
         } else if (userType === 2) {
             // Agricultor e Propriedade
-            const sqlUpdateAgricultor = `
-                UPDATE Agricultor 
+            const sqlUpdateAgricultor = 
+                `UPDATE Agricultor 
                 SET Agri_Biografia = ?, Agri_Foto_Perfil = ?, Agri_Foto_Capa = ?
                 WHERE Usu_Id = ?;`;
             await db.query(sqlUpdateAgricultor, [description, profileImage, profileCover, Usu_Id]);
@@ -466,24 +445,21 @@ async atualizarDadosUsuario(request, response) {
                 `SELECT Prop_Id FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?);`,
                 [Usu_Id]
             );
-
             if (propriedadeIdResult[0].length === 0) {
                 throw new Error(`Propriedade não encontrada para Usu_Id ${Usu_Id}`);
             }
-
             const propId = propriedadeIdResult[0][0].Prop_Id;
-            const sqlUpdatePropriedade = `
-                UPDATE Propriedade
+            const sqlUpdatePropriedade = 
+            `UPDATE Propriedade
                 SET Prop_Nome = ?, Prop_Hectare = ?, Prop_Lat = ?, Prop_Lng = ?, Prop_Cidade = ?, Prop_Estado = ?
-                WHERE Prop_Id = ?;`;
+                WHERE Prop_Id = ?;` 
             await db.query(sqlUpdatePropriedade, [nameFarm, hectares, lat, lng, city, state, propId]);
-
             const sqlDeleteCultivos = `DELETE FROM Cultivo_Propriedade WHERE Prop_Id = ?;`;
             await db.query(sqlDeleteCultivos, [propId]);
 
             if (cultivosSelecionados.length > 0) {
-                const sqlInsertCultivos = `
-                    INSERT INTO Cultivo_Propriedade (Prop_Id, Cult_Id, Cult_Prop_Ativo)
+                const sqlInsertCultivos = 
+                `INSERT INTO Cultivo_Propriedade (Prop_Id, Cult_Id, Cult_Prop_Ativo)
                     VALUES (?, ?, 1);`;
                 for (const cultivoId of cultivosSelecionados) {
                     await db.query(sqlInsertCultivos, [propId, cultivoId]);
@@ -503,6 +479,5 @@ async atualizarDadosUsuario(request, response) {
         });
     }
 },
-
 
 }
