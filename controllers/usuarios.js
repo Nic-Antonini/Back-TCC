@@ -7,9 +7,11 @@ var fs = require('fs-extra');
 const API_URL = process.env.API_URL
 
 function geraUrl(e, userType) {
-    const defaultImage = 'sem.jpg';
-    const profileImage = userType === 1 ? e.Apic_Foto_Perfil || defaultImage : e.Agri_Foto_Perfil || defaultImage;
-    const profileCover = userType === 1 ? e.Apic_Foto_Capa || defaultImage : e.Agri_Foto_Capa || defaultImage;
+    const defaultProfileImageB = 'beekeeper.png';
+    const defaultProfileImageF = 'farmer.png';
+    const defaultProfileCover = 'default-cover.png';
+    const profileImage = userType === 1 ? e.Apic_Foto_Perfil || defaultProfileImageB : e.Agri_Foto_Perfil || defaultProfileImageF;
+    const profileCover = userType === 1 ? e.Apic_Foto_Capa || defaultProfileCover : e.Agri_Foto_Capa || defaultProfileCover;
 
     // Construir os caminhos completos para as URLs e verificar se os arquivos existem
     const imagePath = './public/upload/perfil/';
@@ -396,17 +398,14 @@ async atualizarDadosUsuario(request, response) {
         await db.query(sqlUpdateUsuario, [name, Usu_Id]);
         console.log("Atualizado nome do usuário:", name);
         
-        // Definir variáveis para as imagens
-        let profileImage = request.files?.profileImage ? request.files.profileImage[0].filename : null;
-        let profileCover = request.files?.profileCover ? request.files.profileCover[0].filename : null;
 
         if (userType === 1) {
             // Apicultor e Apiário
             const sqlUpdateApicultor = 
                 `UPDATE Apicultor 
-                SET Apic_Biografia = ?, Apic_Foto_Perfil = ?, Apic_Foto_Capa = ?
+                SET Apic_Biografia = ?
                 WHERE Usu_Id = ?;`;
-            await db.query(sqlUpdateApicultor, [description, profileImage, profileCover, Usu_Id]);
+            await db.query(sqlUpdateApicultor, [description, Usu_Id]);
             console.log("Atualizado Apicultor para Usu_Id:", Usu_Id);
             
             // Atualizar Apiário
@@ -443,9 +442,9 @@ async atualizarDadosUsuario(request, response) {
             // Agricultor e Propriedade
             const sqlUpdateAgricultor = 
                 `UPDATE Agricultor 
-                SET Agri_Biografia = ?, Agri_Foto_Perfil = ?, Agri_Foto_Capa = ?
+                SET Agri_Biografia = ?
                 WHERE Usu_Id = ?;`;
-            await db.query(sqlUpdateAgricultor, [description, profileImage, profileCover, Usu_Id]);
+            await db.query(sqlUpdateAgricultor, [description, Usu_Id]);
 
             const propriedadeIdResult = await db.query(
                 `SELECT Prop_Id FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?);`,
