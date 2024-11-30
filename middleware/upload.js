@@ -1,26 +1,31 @@
 const multer = require('multer');
-const path = require('path');
 
-// Configuração do Multer
+// Definindo o armazenamento
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/uploads'); // Pasta onde os arquivos serão salvos
+  destination: function (req, file, cb) {
+    cb(null, './public/upload/perfil'); // Diretório de destino
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + file.originalname;
-    cb(null, uniqueSuffix);
-  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Gerar um sufixo único
+    const ext = file.mimetype === 'image/jpeg' ? '.jpeg' : file.mimetype.slice(file.mimetype.length - 4); // Garantir a extensão correta
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext); // Nome do arquivo gerado
+  }
 });
 
-// Filtro de tipos de arquivo
+// Filtro de tipo de arquivo
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png'];
-  if (!allowedTypes.includes(file.mimetype)) {
-    return cb(new Error('Apenas arquivos JPEG e PNG são permitidos.'));
+  if (file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true); // Permitir arquivo
+  } else {
+    cb(null, false); // Não permitir
   }
-  cb(null, true);
 };
 
-const upload = multer({ storage, fileFilter });
-
-module.exports = upload;
+// Configurações do multer
+module.exports = multer({
+  storage: storage, // Configuração de armazenamento
+  limits: {
+    fileSize: 1024 * 1024 * 5 // Limite de 5MB por arquivo
+  },
+  fileFilter: fileFilter // Filtro de arquivos
+});

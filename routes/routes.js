@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authentication = require('../middleware/authentication');
+const uploadImg = require('../middleware/upload')
 
 // Referência a controllers que serão utilizados nas rotas
 const UsuariosController = require('../controllers/usuarios'); 
@@ -8,7 +9,10 @@ const UsuariosController = require('../controllers/usuarios');
 router.get('/usuarios', UsuariosController.listarUsuarios);
 router.get('/usuarios/:Usu_Id', UsuariosController.listarDadosUsuario);
 router.post('/usuarios', UsuariosController.cadastrarUsuarios); 
-router.patch('/usuarios/:Usu_Id', UsuariosController.atualizarDadosUsuario); 
+router.patch('/usuarios/:Usu_Id',   uploadImg.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'profileCover', maxCount: 1 },
+  ]), UsuariosController.atualizarDadosUsuario); 
 router.delete('/usuarios/del/:Usu_Id', UsuariosController.ocultarUsuario);
 router.post('/usuarios/login', UsuariosController.login);
 router.get('/protecao', authentication, (req, res) => {

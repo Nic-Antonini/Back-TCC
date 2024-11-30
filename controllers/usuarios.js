@@ -1,9 +1,27 @@
-
-//controller usuarios que lista e atualiza os dados na tela de editar perfil no front
-
 const db = require('../database/connection'); 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
+var fs = require('fs-extra');
+
+const API_URL = process.env.API_URL
+
+function geraUrl(e, userType) {
+    const defaultImage = 'sem.jpg';
+    const profileImage = userType === 1 ? e.Apic_Foto_Perfil || defaultImage : e.Agri_Foto_Perfil || defaultImage;
+    const profileCover = userType === 1 ? e.Apic_Foto_Capa || defaultImage : e.Agri_Foto_Capa || defaultImage;
+
+    // Construir os caminhos completos para as URLs e verificar se os arquivos existem
+    const imagePath = './public/upload/perfil/';
+    const profileImagePath = fs.existsSync(`${imagePath}${profileImage}`) ? profileImage : defaultImage;
+    const profileCoverPath = fs.existsSync(`${imagePath}${profileCover}`) ? profileCover : defaultImage;
+
+    return {
+        profileImage: `${API_URL}/public/upload/perfil/${profileImagePath}`,
+        profileCover: `${API_URL}/public/upload/perfil/${profileCoverPath}`,
+    };
+}
+
 
 module.exports = {
     async listarUsuarios(request, response) {
@@ -72,6 +90,8 @@ module.exports = {
                     const agricultorData = await db.query(sqlAgricultor, [Usu_Id]);
                     additionalData = agricultorData[0][0];
                 }
+
+                const imageUrls = geraUrl(additionalData);
     
                 // Combinar os dados do usuário com os dados adicionais
                 return response.status(200).json({
@@ -79,7 +99,8 @@ module.exports = {
                     mensagem: 'Dados do usuário carregados com sucesso.',
                     dados: {
                         ...user[0][0],
-                        ...additionalData
+                        ...additionalData,
+                        ...imageUrls
                     }
                 });
             } catch (error) {
@@ -162,36 +183,7 @@ module.exports = {
                 });
             }
         },
-        
-        
-
-    async editarUsuarios(request, response) {
-        try {    
-            const {Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo, Usu_Ativo} = request.body;
-            const {Usu_Id} = request.params;
-            const sql= `UPDATE Usuario SET Usu_NomeCompleto = ?,  Usu_Email = ?, Usu_Senha = ?, Usu_Tipo = ?, Usu_Ativo = ?
-                        WHERE Usu_Id = ?;`;
-            const values = [Usu_NomeCompleto, Usu_Email, Usu_Senha, Usu_Tipo, Usu_Ativo, Usu_Id];
-            const atualizaDados = await db.query (sql, values);
-
-        
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: `Usuário ${Usu_Id} atualizado com sucesso!`, 
-                dados: atualizaDados[0].affectedRows
-            });
-
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
-
     
-
 async ocultarUsuario(request, response) {
     try {  
         const Usu_Ativo = false;
@@ -350,6 +342,9 @@ async listarDadosUsuario(request, response) {
                 cultivosSelecionados = cultivos[0].map((c) => c.Cult_Id);
             }
         }
+
+        const imageUrls = geraUrl(additionalData, Usu_Tipo);
+
         return response.status(200).json({
             sucesso: true,
             mensagem: 'Dados do usuário carregados com sucesso.',
@@ -364,6 +359,7 @@ async listarDadosUsuario(request, response) {
                 availability,
                 lat,
                 lng,
+                ...imageUrls
             },
         });
     } catch (error) {
@@ -380,8 +376,6 @@ async atualizarDadosUsuario(request, response) {
         const {
             name,
             description,
-            profileImage,
-            profileCover,
             userType,
             nameApiary,
             nameFarm,
@@ -396,10 +390,16 @@ async atualizarDadosUsuario(request, response) {
         } = request.body;
         
         console.log("Iniciando atualização para Usu_Id:", Usu_Id);
+        
         // Atualizar informações gerais do usuário
         const sqlUpdateUsuario = `UPDATE Usuario SET Usu_NomeCompleto = ? WHERE Usu_Id = ?;`;
         await db.query(sqlUpdateUsuario, [name, Usu_Id]);
         console.log("Atualizado nome do usuário:", name);
+        
+        // Definir variáveis para as imagens
+        let profileImage = request.files?.profileImage ? request.files.profileImage[0].filename : null;
+        let profileCover = request.files?.profileCover ? request.files.profileCover[0].filename : null;
+
         if (userType === 1) {
             // Apicultor e Apiário
             const sqlUpdateApicultor = 
@@ -408,6 +408,8 @@ async atualizarDadosUsuario(request, response) {
                 WHERE Usu_Id = ?;`;
             await db.query(sqlUpdateApicultor, [description, profileImage, profileCover, Usu_Id]);
             console.log("Atualizado Apicultor para Usu_Id:", Usu_Id);
+            
+            // Atualizar Apiário
             const apiaIdResult = await db.query(
                 `SELECT Apia_Id FROM Apiarios WHERE Apic_Id = (SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?);`,
                 [Usu_Id]
@@ -422,9 +424,12 @@ async atualizarDadosUsuario(request, response) {
                 WHERE Apia_Id = ?;`;
             await db.query(sqlUpdateApiario, [nameApiary, availability, lat, lng, city, state, apiaId]);
             console.log("Atualizado Apiário:", apiaId);
+            
+            // Atualizar espécies no Apiário
             const sqlDeleteEspecies = 'DELETE FROM Especie_Apiario WHERE Apia_Id = ?;';
             await db.query(sqlDeleteEspecies, [apiaId]);
             console.log("Especies antigas removidas para Apiário:", apiaId);
+            
             if (especiesSelecionadas.length > 0) {
                 const sqlInsertEspecies = 
                     `INSERT INTO Especie_Apiario (Apia_Id, Espe_Id, Espe_Apia_Ativo)
@@ -455,6 +460,8 @@ async atualizarDadosUsuario(request, response) {
                 SET Prop_Nome = ?, Prop_Hectare = ?, Prop_Lat = ?, Prop_Lng = ?, Prop_Cidade = ?, Prop_Estado = ?
                 WHERE Prop_Id = ?;` 
             await db.query(sqlUpdatePropriedade, [nameFarm, hectares, lat, lng, city, state, propId]);
+
+            // Atualizar cultivos na propriedade
             const sqlDeleteCultivos = `DELETE FROM Cultivo_Propriedade WHERE Prop_Id = ?;`;
             await db.query(sqlDeleteCultivos, [propId]);
 
@@ -479,6 +486,6 @@ async atualizarDadosUsuario(request, response) {
             dados: error.message,
         });
     }
-},
+}
 
 }
