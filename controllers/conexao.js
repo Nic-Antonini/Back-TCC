@@ -1,109 +1,46 @@
 const db = require('../database/connection'); 
 
 module.exports = {
-    async listarConexao(request, response) {
-        try {     
-            const sql = `SELECT
-                Con_Id, Usu_Id_segue, Usu_Id_seguindo
-                FROM Conexao;`;     
-                
-            const conexao = await db.query(sql);
-
-            const nItens = conexao[0].length;
-
-
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: 'Lista de Conexão.', 
-                dados: conexao[0],
-                nItens
-            });
-            
-        } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
-        }
-    }, 
-      
-    async cadastrarConexao(request, response) {
-            try { 
-                const {Usu_Id_segue, Usu_Id_seguindo} = request.body;
-                
-                const sql = `INSERT INTO Conexao
-                    (Usu_Id_segue, Usu_Id_seguindo)
-                    VALUES (?,?)`;
-                    
+    async verificarConexao(req, res) {
+        try {
+            const { Usu_Id_segue, Usu_Id_seguindo } = req.query;
     
-                const values = [Usu_Id_segue, Usu_Id_seguindo]
-                const execSql = await db.query(sql,values);
-                const Con_Id = execSql[0].insertId;
+            const sql = `
+                SELECT Con_Id 
+                FROM Conexao 
+                WHERE Usu_Id_segue = ? AND Usu_Id_seguindo = ?
+            `;
+            const [result] = await db.query(sql, [Usu_Id_segue, Usu_Id_seguindo]);
     
-    
-                return response.status(200).json({
-                    sucesso: true, 
-                    mensagem: 'Cadastro de Conexão.', 
-                    dados: Con_Id
-                });
-            } catch (error) {
-                return response.status(500).json({
-                    sucesso: false,
-                    mensagem: 'Erro na requisição.',
-                    dados: error.message
-                });
+            if (result.length === 0) {
+                return res.status(200).json({ sucesso: true, dados: null });
             }
-        }, 
-        
-
-    async editarConexao(request, response) {
-        try {    
-            const {Usu_Id_segue, Usu_Id_seguindo} = request.body;
-            const {Con_Id} = request.params;
-            const sql= `UPDATE Conexao SET Usu_Id_segue = ?,  Usu_Id_seguindo = ?
-                        WHERE Con_Id = ?;`;
-            const values = [Usu_Id_segue, Usu_Id_seguindo, Con_Id];
-            const atualizaDados = await db.query (sql, values);
-
-        
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: `Conexão ${Con_Id} atualizado com sucesso!`, 
-                dados: atualizaDados[0].affectedRows
-            });
-
+    
+            res.status(200).json({ sucesso: true, dados: result[0] });
         } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
+            res.status(500).json({ sucesso: false, mensagem: "Erro ao buscar conexão.", dados: error.message });
         }
-    }, 
-
-
-
-
-    async apagarConexao(request, response) {
-        try {  
-            const {Con_Id} = request.params;
-            const sql = `DELETE FROM Conexao WHERE Con_Id = ?`;
-            const values = [Con_Id]     
-            const excluir = await db.query (sql, values);
-
-            return response.status(200).json({
-                sucesso: true, 
-                mensagem: `Conexão ${Con_Id} excluído com sucesso`, 
-                dados: excluir [0].affectedRows
-            });
-
+      },
+    
+      async cadastrarConexao(req, res) {
+        try {
+          const { Usu_Id_segue, Usu_Id_seguindo } = req.body;
+          const sql = `INSERT INTO Conexao (Usu_Id_segue, Usu_Id_seguindo) VALUES (?, ?)`;
+          const [result] = await db.query(sql, [Usu_Id_segue, Usu_Id_seguindo]);
+          res.status(200).json({ sucesso: true, dados: result.insertId });
         } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
+          res.status(500).json({ sucesso: false, mensagem: "Erro ao cadastrar conexão.", dados: error.message });
         }
-    }
+      },
+    
+      async apagarConexao(req, res) {
+        try {
+          const { Con_Id } = req.params;
+          const sql = `DELETE FROM Conexao WHERE Con_Id = ?`;
+          const [result] = await db.query(sql, [Con_Id]);
+          res.status(200).json({ sucesso: true, dados: result.affectedRows });
+        } catch (error) {
+          res.status(500).json({ sucesso: false, mensagem: "Erro ao apagar conexão.", dados: error.message });
+        }
+      },
     }

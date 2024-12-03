@@ -4,36 +4,65 @@ const fs = require('fs-extra');
 module.exports = {
     async listarAgricultor(request, response) {
         try {
-            const sql = `SELECT
-            ag.Agri_Id, us.Usu_NomeCompleto, ag.Agri_Foto_Perfil, ag.Agri_Foto_Capa,
-            ag.Agri_Biografia, ag.Usu_Id
-            FROM Agricultor ag 
-            INNER JOIN usuario us ON us.Usu_Id = ag.Usu_Id 
-            WHERE us.Usu_Ativo = 1;`;
-
-            const Agricultor = await db.query(sql);
-
-            const nItens = Agricultor[0].length;
-
-            const resultado = Agricultor[0].map(geraUrl);
-
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Lista de Agricultores.',
-                dados: resultado,
-                nItens
-            });
-
+            const { Agri_Id } = request.params; // Parâmetro da URL
+    
+            const sql = `
+                SELECT 
+                    ag.Agri_Id, 
+                    u.Usu_NomeCompleto, 
+                    ag.Agri_Foto_Perfil
+                FROM 
+                    Agricultor ag
+                INNER JOIN 
+                    Usuario u 
+                ON 
+                    ag.Usu_Id = u.Usu_Id
+                WHERE 
+                    ag.Agri_Id = ?
+            `;
+    
+            const agricultorData = await db.query(sql, [Agri_Id]);
+    
+            if (agricultorData[0].length === 0) {
+                return response.status(404).json({ sucesso: false, mensagem: "Agricultor não encontrado." });
+            }
+    
+            return response.status(200).json({ sucesso: true, dados: agricultorData[0][0] });
         } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
+            return response.status(500).json({ sucesso: false, mensagem: error.message });
         }
     },
 
-
+    async listarAgricultorPorId(request, response) {
+        try {
+            const { Usu_Id } = request.params; // Parâmetro da URL
+    
+            const sql = `
+                SELECT 
+                    ag.Agri_Id, 
+                    u.Usu_NomeCompleto, 
+                    ag.Agri_Foto_Perfil
+                FROM 
+                    Agricultor ag
+                INNER JOIN 
+                    Usuario u 
+                ON 
+                    ag.Usu_Id = u.Usu_Id
+                WHERE 
+                    ag.Usu_Id = ?
+            `;
+    
+            const agricultorData = await db.query(sql, [Usu_Id]);
+    
+            if (agricultorData[0].length === 0) {
+                return response.status(404).json({ sucesso: false, mensagem: "Agricultor não encontrado." });
+            }
+    
+            return response.status(200).json({ sucesso: true, dados: agricultorData[0][0] });
+        } catch (error) {
+            return response.status(500).json({ sucesso: false, mensagem: error.message });
+        }
+    },
 
 
     async cadastrarAgricultor(request, response) {

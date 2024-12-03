@@ -22,10 +22,17 @@ router.get('/protecao', authentication, (req, res) => {
     });
 });
 
+// Rotas específicas
+router.get('/usuarios/recomendados/:Usu_Id', UsuariosController.listarUsuariosRecomendados);
+router.get('/usuarios/favoritos/:Usu_Id', UsuariosController.listarUsuariosFavoritados);
+router.get('/usuarios/proximos/:Usu_Id', UsuariosController.listarUsuariosProximos);
+router.get('/usuarios/pesquisar', UsuariosController.pesquisarUsuarios);
+
 
 const ApicultorController = require('../controllers/apicultor'); 
 
-router.get('/apicultor', ApicultorController.listarApicultor); 
+router.get('/apicultor/info/:Apic_Id', ApicultorController.listarApicultor); 
+router.get('/apicultor/:Usu_Id', ApicultorController.listarApicultorPorId); 
 router.post('/apicultor', ApicultorController.cadastrarApicultor);    
 router.patch('/apicultor/:Apic_Id', ApicultorController.editarApicultor); 
 router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
@@ -33,7 +40,8 @@ router.delete('/apicultor/:Usu_Id', ApicultorController.apagarApicultor);
 
 const AgricultorController = require('../controllers/agricultor'); 
 
-router.get('/agricultor', AgricultorController.listarAgricultor); 
+router.get('/agricultor/info/:Agri_Id', AgricultorController.listarAgricultor); 
+router.get('/agricultor/:Usu_Id', AgricultorController.listarAgricultorPorId); 
 router.post('/agricultor', AgricultorController.cadastrarAgricultor);
 router.patch('/agricultor/:Agri_Id', AgricultorController.editarAgricultor);
 router.delete('/agricultor/:Usu_Id', AgricultorController.apagarAgricultor);
@@ -50,9 +58,10 @@ router.delete('/apiarios/del/:Apia_Id', ApiariosController.ocultarApiarios);
 const ChatController = require('../controllers/chat'); 
 
 router.get('/chat', ChatController.listarChat); 
-router.post('/chat', ChatController.cadastrarChat);
-router.patch('/chat/:Chat_Id', ChatController.editarChat); 
-router.delete('/chat/del/:Chat_Id', ChatController.ocultarChat);
+router.get('/chat/messages/:chatId', ChatController.listarMensagens);
+router.get('/chat/detalhes/:Chat_Id', ChatController.detalhesChat);
+router.get("/chat/usuario/:Usu_Id", ChatController.listarChatsPorUsuario);
+router.post('/chat', ChatController.cadastrarChat); 
 
 
 
@@ -65,9 +74,8 @@ router.delete('/especie_apiario/del/:Espe_Apia_Id', EspecieApiarioController.ocu
 
 const ConexaoController = require('../controllers/conexao'); 
 
-router.get('/conexao', ConexaoController.listarConexao); 
+router.get('/conexao', ConexaoController.verificarConexao); 
 router.post('/conexao', ConexaoController.cadastrarConexao); 
-router.patch('/conexao/:Con_Id', ConexaoController.editarConexao); 
 router.delete('/conexao/:Con_Id', ConexaoController.apagarConexao); 
 
 const CultivoController = require('../controllers/cultivo'); 

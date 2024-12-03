@@ -1,39 +1,70 @@
 const db = require('../database/connection');
 const fs = require('fs-extra');
 
+
 module.exports = {
     async listarApicultor(request, response) {
         try {
-            const sql = `SELECT
-            ap.Apic_Id, us.Usu_NomeCompleto, ap.Apic_Foto_Perfil, ap.Apic_Foto_Capa,
-            ap.Apic_Biografia, ap.Usu_Id
-            FROM Apicultor ap 
-            INNER JOIN usuario us ON us.Usu_Id = ap.Usu_Id 
-            WHERE us.Usu_Ativo = 1;`;
-
-            const Apicultor = await db.query(sql);
-
-            const nItens = Apicultor[0].length;
-
-            const resultado = Apicultor[0].map(geraUrl);
-
-            return response.status(200).json({
-                sucesso: true,
-                mensagem: 'Lista de Apicultores.',
-                dados: resultado,
-                nItens
-            });
-
+            const { Apic_Id } = request.params; // Parâmetro da URL
+    
+            const sql = `
+                SELECT 
+                    a.Apic_Id, 
+                    u.Usu_NomeCompleto, 
+                    a.Apic_Foto_Perfil
+                FROM 
+                    Apicultor a
+                INNER JOIN 
+                    Usuario u 
+                ON 
+                    a.Usu_Id = u.Usu_Id
+                WHERE 
+                    a.Apic_Id = ?
+            `;
+    
+            const apicultorData = await db.query(sql, [Apic_Id]);
+    
+            if (apicultorData[0].length === 0) {
+                return response.status(404).json({ sucesso: false, mensagem: "Apicultor não encontrado." });
+            }
+    
+            return response.status(200).json({ sucesso: true, dados: apicultorData[0][0] });
         } catch (error) {
-            return response.status(500).json({
-                sucesso: false,
-                mensagem: 'Erro na requisição.',
-                dados: error.message
-            });
+            return response.status(500).json({ sucesso: false, mensagem: error.message });
         }
     },
 
 
+    async listarApicultorPorId(request, response) {
+        try {
+            const { Usu_Id } = request.params; // Parâmetro da URL
+    
+            const sql = `
+                SELECT 
+                    a.Apic_Id, 
+                    u.Usu_NomeCompleto, 
+                    a.Apic_Foto_Perfil
+                FROM 
+                    Apicultor a
+                INNER JOIN 
+                    Usuario u 
+                ON 
+                    a.Usu_Id = u.Usu_Id
+                WHERE 
+                    a.Usu_Id = ?
+            `;
+    
+            const apicultorData = await db.query(sql, [Usu_Id]);
+    
+            if (apicultorData[0].length === 0) {
+                return response.status(404).json({ sucesso: false, mensagem: "Apicultor não encontrado." });
+            }
+    
+            return response.status(200).json({ sucesso: true, dados: apicultorData[0][0] });
+        } catch (error) {
+            return response.status(500).json({ sucesso: false, mensagem: error.message });
+        }
+    },
 
 
     async cadastrarApicultor(request, response) {

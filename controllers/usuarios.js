@@ -4,7 +4,24 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 var fs = require('fs-extra');
 
-const API_URL = process.env.API_URL
+
+function geraUrl2(e, userType) {
+    const defaultProfileImageB = 'beekeeper.png';
+    const defaultProfileImageF = 'farmer.png';
+    const defaultProfileCover = 'default-cover.png';
+    
+    // Verificar se existe uma foto personalizada para o perfil
+    const profileImage = e.Foto_Perfil ? e.Foto_Perfil : (userType === 1 ? defaultProfileImageB : defaultProfileImageF);
+    const profileCover = userType === 1 ? e.Apic_Foto_Capa || defaultProfileCover : e.Agri_Foto_Capa || defaultProfileCover;
+
+    // Construir URLs completas
+    const API_URL = process.env.API_URL; // Base da URL
+    return {
+        profileImage: `${API_URL}/public/upload/perfil/${profileImage}`,
+        profileCover: `${API_URL}/public/upload/perfil/${profileCover}`,
+    };
+}
+
 
 function geraUrl(e, userType) {
     const defaultProfileImageB = 'beekeeper.png';
@@ -13,16 +30,14 @@ function geraUrl(e, userType) {
     const profileImage = userType === 1 ? e.Apic_Foto_Perfil || defaultProfileImageB : e.Agri_Foto_Perfil || defaultProfileImageF;
     const profileCover = userType === 1 ? e.Apic_Foto_Capa || defaultProfileCover : e.Agri_Foto_Capa || defaultProfileCover;
 
-    // Construir os caminhos completos para as URLs e verificar se os arquivos existem
-    const imagePath = './public/upload/perfil/';
-    const profileImagePath = fs.existsSync(`${imagePath}${profileImage}`) ? profileImage : defaultImage;
-    const profileCoverPath = fs.existsSync(`${imagePath}${profileCover}`) ? profileCover : defaultImage;
-
+    // Construir URLs completas
+    const API_URL = process.env.API_URL; // Base da URL
     return {
-        profileImage: `${API_URL}/public/upload/perfil/${profileImagePath}`,
-        profileCover: `${API_URL}/public/upload/perfil/${profileCoverPath}`,
+        profileImage: `${API_URL}/public/upload/perfil/${profileImage}`,
+        profileCover: `${API_URL}/public/upload/perfil/${profileCover}`,
     };
 }
+
 
 
 module.exports = {
@@ -485,6 +500,208 @@ async atualizarDadosUsuario(request, response) {
             dados: error.message,
         });
     }
+},
+
+async listarUsuariosRecomendados(request, response) {
+    try {
+        const { Usu_Id } = request.params;
+        
+        // Buscar tipo do usuário logado
+        const sqlUser = `SELECT Usu_Tipo FROM Usuario WHERE Usu_Id = ? AND Usu_Ativo = 1;`;
+        const [userResult] = await db.query(sqlUser, [Usu_Id]);
+
+        if (userResult.length === 0) {
+            return response.status(404).json({
+                sucesso: false,
+                mensagem: 'Usuário não encontrado ou inativo.',
+            });
+        }
+
+        const userType = userResult[0].Usu_Tipo;
+        const recommendedUserType = userType === 1 ? 2 : 1; // Apicultor (1) recomenda Agricultor (2) e vice-versa
+
+        // Buscar usuários do tipo recomendado e as fotos de perfil
+        const sqlRecommended = `
+            SELECT u.Usu_Id, u.Usu_NomeCompleto, u.Usu_Tipo, 
+                CASE 
+                    WHEN u.Usu_Tipo = 1 THEN a.Apic_Foto_Perfil
+                    WHEN u.Usu_Tipo = 2 THEN ag.Agri_Foto_Perfil
+                END AS Foto_Perfil
+            FROM Usuario u
+            LEFT JOIN Apicultor a ON u.Usu_Id = a.Usu_Id AND u.Usu_Tipo = 1
+            LEFT JOIN Agricultor ag ON u.Usu_Id = ag.Usu_Id AND u.Usu_Tipo = 2
+            WHERE u.Usu_Tipo = ? AND u.Usu_Ativo = 1 
+            ORDER BY RAND() LIMIT 10;
+        `;
+        const [recommendedUsers] = await db.query(sqlRecommended, [recommendedUserType]);
+
+        const usersWithUrls = recommendedUsers.map((user) => {
+            const urls = geraUrl2(user, user.Usu_Tipo); // Gerar a URL completa para as fotos
+            return { ...user, ...urls };
+        });
+
+        return response.status(200).json({
+            sucesso: true,
+            mensagem: 'Usuários recomendados encontrados.',
+            dados: usersWithUrls,
+        });
+    } catch (error) {
+        return response.status(500).json({
+            sucesso: false,
+            mensagem: 'Erro ao buscar usuários recomendados.',
+            dados: error.message,
+        });
+    }
+},
+
+
+async listarUsuariosFavoritados(request, response) {
+    try {
+        const { Usu_Id } = request.params;
+
+        const sqlFavorites = `
+            SELECT u.Usu_Id, u.Usu_NomeCompleto, u.Usu_Tipo, 
+                CASE 
+                    WHEN u.Usu_Tipo = 1 THEN a.Apic_Foto_Perfil
+                    WHEN u.Usu_Tipo = 2 THEN ag.Agri_Foto_Perfil
+                END AS Foto_Perfil
+            FROM Conexao c
+            INNER JOIN Usuario u ON u.Usu_Id = c.Usu_Id_seguindo
+            LEFT JOIN Apicultor a ON u.Usu_Id = a.Usu_Id AND u.Usu_Tipo = 1
+            LEFT JOIN Agricultor ag ON u.Usu_Id = ag.Usu_Id AND u.Usu_Tipo = 2
+            WHERE c.Usu_Id_segue = ? AND u.Usu_Ativo = 1;
+        `;
+        const [favoriteUsers] = await db.query(sqlFavorites, [Usu_Id]);
+
+        const usersWithUrls = favoriteUsers.map((user) => {
+            const urls = geraUrl2(user, user.Usu_Tipo); // Gerar a URL completa para as fotos
+            return { ...user, ...urls };
+        });
+
+        return response.status(200).json({
+            sucesso: true,
+            mensagem: 'Usuários favoritados encontrados.',
+            dados: usersWithUrls,
+        });
+    } catch (error) {
+        return response.status(500).json({
+            sucesso: false,
+            mensagem: 'Erro ao buscar usuários favoritados.',
+            dados: error.message,
+        });
+    }
+},
+
+async listarUsuariosProximos(request, response) {
+    try {
+        const { Usu_Id } = request.params;
+
+        const sqlLocation = `
+            SELECT 
+                Usu_Tipo,
+                CASE 
+                    WHEN Usu_Tipo = 1 THEN (SELECT Apia_Lat FROM Apiarios WHERE Apic_Id = (SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?))
+                    WHEN Usu_Tipo = 2 THEN (SELECT Prop_Lat FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?))
+                END AS latitude,
+                CASE 
+                    WHEN Usu_Tipo = 1 THEN (SELECT Apia_Lng FROM Apiarios WHERE Apic_Id = (SELECT Apic_Id FROM Apicultor WHERE Usu_Id = ?))
+                    WHEN Usu_Tipo = 2 THEN (SELECT Prop_Lng FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = ?))
+                END AS longitude
+            FROM Usuario
+            WHERE Usu_Id = ? AND Usu_Ativo = 1;
+        `;
+        const [locationResult] = await db.query(sqlLocation, [Usu_Id, Usu_Id, Usu_Id, Usu_Id, Usu_Id]);
+
+        if (locationResult.length === 0) {
+            return response.status(404).json({
+                sucesso: false,
+                mensagem: 'Localização do usuário não encontrada.',
+            });
+        }
+
+        const { latitude, longitude, Usu_Tipo } = locationResult[0];
+        const otherUserType = Usu_Tipo === 1 ? 2 : 1;
+
+        const sqlNearbyUsers = `
+            SELECT u.Usu_Id, u.Usu_NomeCompleto, u.Usu_Tipo,
+            CASE 
+                WHEN u.Usu_Tipo = 1 THEN (SELECT Apia_Lat FROM Apiarios WHERE Apic_Id = (SELECT Apic_Id FROM Apicultor WHERE Usu_Id = u.Usu_Id))
+                WHEN u.Usu_Tipo = 2 THEN (SELECT Prop_Lat FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = u.Usu_Id))
+            END AS latitude,
+            CASE 
+                WHEN u.Usu_Tipo = 1 THEN (SELECT Apia_Lng FROM Apiarios WHERE Apic_Id = (SELECT Apic_Id FROM Apicultor WHERE Usu_Id = u.Usu_Id))
+                WHEN u.Usu_Tipo = 2 THEN (SELECT Prop_Lng FROM Propriedade WHERE Agri_Id = (SELECT Agri_Id FROM Agricultor WHERE Usu_Id = u.Usu_Id))
+            END AS longitude,
+            CASE 
+                WHEN u.Usu_Tipo = 1 THEN a.Apic_Foto_Perfil
+                WHEN u.Usu_Tipo = 2 THEN ag.Agri_Foto_Perfil
+            END AS Foto_Perfil
+            FROM Usuario u
+            LEFT JOIN Apicultor a ON u.Usu_Id = a.Usu_Id AND u.Usu_Tipo = 1
+            LEFT JOIN Agricultor ag ON u.Usu_Id = ag.Usu_Id AND u.Usu_Tipo = 2
+            WHERE u.Usu_Tipo = ? AND u.Usu_Ativo = 1
+            HAVING latitude IS NOT NULL AND longitude IS NOT NULL
+            ORDER BY 
+                (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))
+            LIMIT 10;
+        `;
+        const [nearbyUsers] = await db.query(sqlNearbyUsers, [otherUserType, latitude, longitude, latitude]);
+
+        const usersWithUrls = nearbyUsers.map((user) => {
+            const urls = geraUrl2(user, user.Usu_Tipo); // Gerar a URL completa para as fotos
+            return { ...user, ...urls };
+        });
+
+        return response.status(200).json({
+            sucesso: true,
+            mensagem: 'Usuários próximos encontrados.',
+            dados: usersWithUrls,
+        });
+    } catch (error) {
+        return response.status(500).json({
+            sucesso: false,
+            mensagem: 'Erro ao buscar usuários próximos.',
+            dados: error.message,
+        });
+    }
+},
+async pesquisarUsuarios(request, response) {
+    try {
+        const { searchQuery, userType } = request.query;
+        
+        console.log("Parâmetros recebidos:", { searchQuery, userType }); // Log de depuração
+
+        const sql = `
+            SELECT u.Usu_Id, u.Usu_NomeCompleto, u.Usu_Tipo, 
+                   CASE 
+                       WHEN u.Usu_Tipo = 1 THEN a.Apic_Foto_Perfil
+                       WHEN u.Usu_Tipo = 2 THEN ag.Agri_Foto_Perfil
+                   END AS Foto_Perfil
+            FROM Usuario u
+            LEFT JOIN Apicultor a ON u.Usu_Id = a.Usu_Id AND u.Usu_Tipo = 1
+            LEFT JOIN Agricultor ag ON u.Usu_Id = ag.Usu_Id AND u.Usu_Tipo = 2
+            WHERE u.Usu_Tipo = ? AND u.Usu_Ativo = 1 AND u.Usu_NomeCompleto LIKE CONCAT('%', ?, '%')
+            LIMIT 10;
+        `;
+
+        const [result] = await db.query(sql, [userType === '1' ? 1 : 2, searchQuery]);
+
+        console.log("Resultado da consulta:", result); // Log de depuração
+
+        if (result.length === 0) {
+            return response.status(404).json({
+                sucesso: false,
+                mensagem: 'Usuário não encontrado ou inativo.',
+            });
+        }
+
+        return response.json({ sucesso: true, dados: result });
+    } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+        return response.status(500).json({ sucesso: false, mensagem: "Erro ao buscar usuários." });
+    }
 }
+
+
 
 }
